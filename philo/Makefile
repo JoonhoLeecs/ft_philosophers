@@ -1,0 +1,44 @@
+NAME = philo
+
+CC = cc
+CFLAGS = -Werror -Wall -Wextra -g -O3 -fsanitize=address
+LDFLAGS = -pthread
+
+MAKE = make
+MFLAGS = -C
+
+RM = rm
+RMFLAGS = -rf
+
+HEADER = \
+philosophers.h
+
+# INCLUDES = -I./mandatory
+
+MANDATORY_SRCS = \
+check_init_args.c \
+philo_utils.c \
+philosophers.c
+
+MANDATORY_OBJS = $(MANDATORY_SRCS:.c=.o)
+
+all : $(NAME)
+
+$(NAME) : $(MANDATORY_OBJS) $(HEADER)
+	$(CC) $(CFLAGS) -o $@ $(MANDATORY_OBJS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -c $< -o $@ $(INCLUDES)
+
+clean :
+	$(RM) $(RMFLAGS) $(MANDATORY_OBJS)
+
+fclean :
+	$(MAKE)	clean
+	$(RM) $(RMFLAGS) $(NAME)
+
+re :
+	$(MAKE) fclean
+	$(MAKE) all
+
+.PHONY : all clean fclean re
