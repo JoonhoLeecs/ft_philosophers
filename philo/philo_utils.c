@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:58:21 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/07 08:19:42 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/09 20:36:17 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,21 +40,36 @@ int	philo_atoi(const char *str)
 	return ((int)nbr);
 }
 
-// return timeval.tv_usec as positive int value on success,
-// or -1 on fail to call gettimeofday
-int	get_utime(void)
-{
-	t_timeval	time;
-	int			check;
-
-	check = gettimeofday(&time, NULL);
-	if (check == -1)
-		return (-1);
-	return (time.tv_usec);
-}
-
+//print error on STDERR and return exit_status
 int	perror_n_return(int exit_status)
 {
 	write(STDERR_FILENO, "Error: invalid arguement\n", 26);
 	return (exit_status);
+}
+
+// return time passed since ref as microseconds
+long	get_utime_diff(t_timeval time, t_timeval ref)
+{
+	long	diff;
+
+	diff = (time.tv_sec - ref.tv_sec) * 1000000 + (time.tv_usec - ref.tv_usec);
+	return (diff);
+}
+
+// return time passed since ref as milliseconds
+long	get_mtime_diff(t_timeval time, t_timeval ref)
+{
+	long	diff;
+
+	diff = (time.tv_sec - ref.tv_sec) * 1000
+		+ (time.tv_usec - ref.tv_usec) / 1000;
+	return (diff);
+}
+
+int	philo_max(int a, int b)
+{
+	if (a > b)
+		return (a);
+	else
+		return (b);
 }

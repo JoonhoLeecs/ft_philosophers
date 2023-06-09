@@ -1,7 +1,8 @@
 NAME = philo
 
 CC = cc
-CFLAGS = -Werror -Wall -Wextra -g -O3 -fsanitize=address
+CFLAGS = -Werror -Wall -Wextra
+# CFLAGS = -Werror -Wall -Wextra -g -O3 -fsanitize=address
 LDFLAGS = -pthread
 
 MAKE = make
