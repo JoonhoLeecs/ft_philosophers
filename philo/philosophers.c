@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/09 22:02:46 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/09 22:27:37 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,9 @@ int	check_starvation(t_philo *philo, t_timeval time)
 void	philo_eat(t_philo *philo)
 {
 	t_timeval	time;
+	int			unit_time;
 
+	unit_time = T_UNIT;
 	while (philo->alive == 1
 		&& (philo->status == EATING || philo->status == TO_EAT))
 	{
@@ -164,11 +166,13 @@ void	philo_eat(t_philo *philo)
 		if (philo->status == TO_EAT && philo->n_forks == 2)
 		{
 			pthread_mutex_lock(&philo->share->print_lock);
+				gettimeofday(&time, NULL);
 			printf("%ld %d is eating\n",
 				get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
 			pthread_mutex_unlock(&philo->share->print_lock);
 			philo->t_last_eat = time;
 			philo->status = EATING;
+			unit_time = T_UNIT * 2;
 			continue ;
 		}
 		else if (get_utime_diff(time, philo->t_last_eat) > philo->share->t_eat)
@@ -181,7 +185,7 @@ void	philo_eat(t_philo *philo)
 			philo->status = TO_SLEEP;
 			return ;
 		}
-		usleep(T_UNIT);
+		usleep(unit_time);
 	}
 }
 
@@ -211,7 +215,7 @@ void	philo_sleep(t_philo *philo)
 			philo->status = TO_THINK;
 			return ;
 		}
-		usleep(T_UNIT);
+		usleep(2 * T_UNIT);
 	}
 }
 

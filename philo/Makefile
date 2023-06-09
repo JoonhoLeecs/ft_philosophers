@@ -26,7 +26,7 @@ MANDATORY_OBJS = $(MANDATORY_SRCS:.c=.o)
 all : $(NAME)
 
 $(NAME) : $(MANDATORY_OBJS) $(HEADER)
-	$(CC) $(CFLAGS) -o $@ $(MANDATORY_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MANDATORY_OBJS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -c $< -o $@ $(INCLUDES)
