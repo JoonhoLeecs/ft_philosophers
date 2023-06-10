@@ -19,7 +19,10 @@ philosophers.h
 MANDATORY_SRCS = \
 check_init_args.c \
 philo_utils.c \
-philosophers.c
+philosophers.c \
+philo_routine.c \
+monitoring.c
+
 
 MANDATORY_OBJS = $(MANDATORY_SRCS:.c=.o)
 

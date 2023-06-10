@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:27:56 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/09 15:07:45 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/10 10:59:38 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,9 @@ int	save_args(t_share *share, int *n, int i)
 	share->t_die = n[1] * 1000;
 	share->t_eat = n[2] * 1000;
 	share->t_sleep = n[3] * 1000;
+	share->n_eat = -1;
 	if (i > 5)
 		share->n_eat = n[4];
-	else
-		share->n_eat = -1;
 	share->forks = (int *) malloc(sizeof (int) * share->n_philo);
 	if (share->forks == NULL)
 		return (EXIT_FAILURE);
@@ -66,27 +65,39 @@ int	save_args(t_share *share, int *n, int i)
 		pthread_mutex_init(share->fork_locks + j++, NULL);
 	pthread_mutex_init(&(share->print_lock), NULL);
 	pthread_mutex_init(&(share->all_alive_lock), NULL);
-	share->all_alive = 1;
+	share->all_alive = ALL_ALIVE;
 	return (EXIT_SUCCESS);
 }
 
-	// share->print_locks = (t_mutex *) malloc(sizeof (t_mutex));
-	// if (share->print_locks == NULL)
-	// {
-	// 	free(share->forks);
-	// 	share->forks = NULL;
-	// 	free(share->fork_locks);
-	// 	share->fork_locks = NULL;
-	// 	return (EXIT_FAILURE);
-	// }
-	// share->exit_locks = (t_mutex *) malloc(sizeof (t_mutex) * share->n_philo);
-	// if (share->exit_locks == NULL)
-	// {
-	// 	free(share->forks);
-	// 	share->forks = NULL;
-	// 	free(share->fork_locks);
-	// 	share->fork_locks = NULL;
-	// 	free(share->print_locks);
-	// 	share->print_locks = NULL;
-	// 	return (EXIT_FAILURE);
-	// }
+t_philo	*init_philos(t_share *share)
+{
+	t_philo	*philos;
+	int		i;
+
+	philos = (t_philo *)malloc((share->n_philo) * sizeof(t_philo));
+	if (philos == NULL)
+		return (NULL);
+	i = 0;
+	while (i < share->n_philo)
+	{
+		philos[i].share = share;
+		philos[i].ind = i;
+		philos[i].alive = ALIVE;
+		philos[i].n_eat = 0;
+		philos[i].n_forks = 0;
+		if (i % 2 == 0)
+		{
+			philos[i].first_fork = i;
+			philos[i].second_fork = (i + 1) % share->n_philo;
+		}
+		else
+		{
+			philos[i].second_fork = i;
+			philos[i].first_fork = (i + 1) % share->n_philo;
+		}
+		philos[i].status = TO_EAT;
+		// pthread_mutex_init(&(philos[i].alive_lock), NULL);
+		i++;
+	}
+	return (philos);
+}

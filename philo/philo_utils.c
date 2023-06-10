@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:58:21 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/09 20:36:17 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/10 11:25:40 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,12 @@ int	philo_max(int a, int b)
 		return (a);
 	else
 		return (b);
+}
+
+long	philo_min(long a, long b)
+{
+	if (a > b)
+		return (b);
+	else
+		return (a);
 }
