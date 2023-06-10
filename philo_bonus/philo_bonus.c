@@ -1,32 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosophers.c                                     :+:      :+:    :+:   */
+/*   philo_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 17:08:01 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/10 17:06:04 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "philo_bonus.h"
 
 void	check_leak(void)
 {
-	system("leaks philo");
+	system("leaks philo_bonus");
 }
 
 int	main(int argc, char **argv)
 {
 	t_share	*share;
 	t_philo	*philos;
-	int		check;
+	int		pid;
 	int		i;
 
 	share = check_init_args(argc, argv);
 	if (share == NULL)
 		return (perror_n_return(EXIT_FAILURE));
+	// test_print_share(share);
 	philos = init_philos(share);
 	if (philos == NULL)
 	{
@@ -34,41 +35,33 @@ int	main(int argc, char **argv)
 		return (perror_n_return(EXIT_FAILURE));
 	}
 	gettimeofday(&(share->t_start), NULL);
-	check = 0;
 	i = 1;
 	while (i < share->n_philo)
 	{
-		check = pthread_create(&((philos + i)->thread), NULL,
-				philo_routine, (philos + i));
-		if (check != 0)
+		pid = fork();
+		if (pid == -1)
 			return (EXIT_FAILURE);
-		i = odd_even_iterator(i, share->n_philo);
+		else if (pid == 0)
+			return (philo_routine(philos + i));
+		else
+		{
+			(philos + i)->pid = pid;
+			i = odd_even_iterator(i, share->n_philo);
+		}
 	}
-	if (share->n_eat > -1)
-		check = pthread_create(&share->monitoring, NULL,
-				monitoring_routine, philos);
-	i = 0;
-	while (i < share->n_philo)
-	{
-		check = pthread_join((philos + i)->thread, NULL);
-		if (check != 0)
-			return (EXIT_FAILURE);
-		i++;
-	}
-	if (share->n_eat > -1)
-		check = pthread_join(share->monitoring, NULL);
-	clear_all(share, philos);
-	return (EXIT_SUCCESS);
+	return (parent(share, philos, i));
 }
-	// the followings are test code for gettimeofday();
-	// t_timeval	start;
-	// t_timeval	end;
 
-	// gettimeofday(&start, NULL);
-	// gettimeofday(&end, NULL);
-	// printf("start.tv_sec:%ld|tv_usec:%d\n", start.tv_sec, start.tv_usec);
-	// printf("time interval in sec:%ld\n", end.tv_sec - start.tv_sec);
-	// printf("time interval in usec:%d\n", end.tv_usec - start.tv_usec);
+void	clear_all(t_share *share, t_philo *philos)
+{
+	free(philos);
+	clear_share(share);
+}
+
+void	clear_share(t_share *share)
+{
+	free(share);
+}
 
 int	odd_even_iterator(int i, int n_philo)
 {
@@ -84,26 +77,15 @@ int	odd_even_iterator(int i, int n_philo)
 		result = i + 2;
 	return (result);
 }
+	// int	i;
 
-void	clear_all(t_share *share, t_philo *philos)
-{
-	free(philos);
-	clear_share(share);
-}
-
-void	clear_share(t_share *share)
-{
-	int	i;
-
-	i = 0;
-	free(share->forks);
-	while (i < share->n_philo)
-		pthread_mutex_destroy(share->fork_locks + i++);
-	free(share->fork_locks);
-	pthread_mutex_destroy(&share->print_lock);
-	pthread_mutex_destroy(&share->all_alive_lock);
-	free(share);
-}
+	// i = 0;
+	// free(share->forks);
+	// while (i < share->n_philo)
+	// 	pthread_mutex_destroy(share->fork_locks + i++);
+	// free(share->fork_locks);
+	// pthread_mutex_destroy(&share->print_lock);
+	// pthread_mutex_destroy(&share->all_alive_lock);
 
 void test_print_share(t_share *share)
 {

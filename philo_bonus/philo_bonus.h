@@ -1,24 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosophers.h                                     :+:      :+:    :+:   */
+/*   philo_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 17:07:51 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/10 18:50:57 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILOSOPHERS_H
-# define PHILOSOPHERS_H
+#ifndef PHILO_BONUS_H
+# define PHILO_BONUS_H
 
 # include <stdlib.h>
+# include <string.h>
 # include <unistd.h>
 # include <sys/time.h>
-# include <pthread.h>
-# include <string.h>
 
+
+# include <pthread.h>
 # include <stdio.h>
 // need to check headers above after compeletion
 
@@ -60,23 +61,23 @@ typedef struct s_share
 	long		t_sleep;
 	int			n_eat;
 	t_timeval	t_start;
-	int			*forks;
-	t_mutex		*fork_locks;
+	// int			*forks;
+	// t_mutex		*fork_locks;
 	t_all_alive	all_alive;
-	t_mutex		all_alive_lock;
-	t_mutex		print_lock;
-	t_pthread	monitoring;
+	// t_mutex		all_alive_lock;
+	// t_mutex		print_lock;
+	// t_pthread	monitoring;
 }				t_share;
 
 typedef struct s_philo
 {
 	t_share		*share;
-	t_pthread	thread;
+	int			pid;
 	int			ind;
 	int			n_eat;
 	int			n_forks;
-	int			first_fork;
-	int			second_fork;
+	// int			first_fork;
+	// int			second_fork;
 	t_alive		alive;
 	t_status	status;
 	t_timeval	t_last_eat;
@@ -88,7 +89,7 @@ int		save_args(t_share *share, int *n, int i);
 t_philo	*init_philos(t_share *share);
 int		odd_even_iterator(int i, int n_philo);
 
-void	*philo_routine(void *arg);
+int		philo_routine(t_philo *philo);
 int		check_starvation(t_philo *philo, t_timeval time);
 void	philo_eat(t_philo *philo);
 void	take_forks(t_philo *philo);
@@ -97,7 +98,8 @@ void	philo_sleep(t_philo *philo);
 void	philo_think(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
 
-void	*monitoring_routine(void *arg);
+int		parent(t_share *share, t_philo *philos, int ind);
+	// void	*monitoring_routine(void *arg);
 
 int		philo_atoi(const char *str);
 int		perror_n_return(int exit_status);
@@ -109,6 +111,6 @@ long	philo_min(long a, long b);
 void	clear_all(t_share *share, t_philo *philos);
 void	clear_share(t_share *share);
 
-void	test_print_share(t_share *share);
+// void	test_print_share(t_share *share);
 
 #endif
