@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 11:32:41 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/10 15:49:34 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ void	*philo_routine(void *arg)
 	gettimeofday(&(philo->t_last_eat), NULL);
 	gettimeofday(&(philo->t_last_sleep), NULL);
 	if (philo->ind % 2 == 0)
-		usleep(philo_max(100, philo->share->n_philo * 2));
+		// usleep(philo_max(100, philo->share->n_philo * 2 + philo->ind));
+		usleep(philo_max(100, philo->share->n_philo * 3 / 2));
 	while (philo->alive != DEAD)
 	{
 		philo_actions[(int)philo->status](philo);
@@ -123,6 +124,7 @@ void	philo_sleep(t_philo *philo)
 		if (philo->status == TO_SLEEP)
 		{
 			pthread_mutex_lock(&philo->share->print_lock);
+				gettimeofday(&time, NULL);
 			printf("%ld %d is sleeping\n",
 				get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
 			pthread_mutex_unlock(&philo->share->print_lock);
@@ -197,6 +199,13 @@ void	take_forks(t_philo *philo)
 
 void	put_back_forks(t_philo *philo)
 {
+	// if (philo->n_forks == 2)
+	// {
+	// 	*(philo->share->forks + philo->second_fork) = 0;
+	// 	pthread_mutex_unlock(philo->share->fork_locks + philo->second_fork);
+	// 	philo->n_forks -= 1;
+	// }
+	// if (philo->n_forks == 1)
 	if (philo->n_forks == 2)
 	{
 		*(philo->share->forks + philo->first_fork) = 0;

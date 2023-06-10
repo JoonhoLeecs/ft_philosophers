@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:27:56 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 10:59:38 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/10 14:57:32 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ t_share	*check_init_args(int argc, char **argv)
 	share = (t_share *) malloc(sizeof(t_share));
 	if (share == NULL)
 		return (NULL);
+	memset(share, 0, sizeof(t_share));
 	if (save_args(share, n, i))
 	{
 		free(share);
@@ -42,6 +43,7 @@ t_share	*check_init_args(int argc, char **argv)
 int	save_args(t_share *share, int *n, int i)
 {
 	int	j;
+	int	check;
 
 	share->n_philo = n[0];
 	share->t_die = n[1] * 1000;
@@ -60,11 +62,37 @@ int	save_args(t_share *share, int *n, int i)
 		share->forks = NULL;
 		return (EXIT_FAILURE);
 	}
+	check = 0;
 	j = 0;
-	while (j < share->n_philo)
-		pthread_mutex_init(share->fork_locks + j++, NULL);
-	pthread_mutex_init(&(share->print_lock), NULL);
-	pthread_mutex_init(&(share->all_alive_lock), NULL);
+	while (j < share->n_philo && check == 0)
+		check = pthread_mutex_init(share->fork_locks + j++, NULL);
+	if (check != 0)
+	{
+		free(share->forks);
+		free(share->fork_locks);
+		while (--j >= 0)
+			pthread_mutex_destroy(share->fork_locks + j);
+		return (EXIT_FAILURE);
+	}
+	check = pthread_mutex_init(&(share->print_lock), NULL);
+	if (check != 0)
+	{
+		free(share->forks);
+		free(share->fork_locks);
+		while (--j >= 0)
+			pthread_mutex_destroy(share->fork_locks + j);
+		return (EXIT_FAILURE);
+	}
+	check = pthread_mutex_init(&share->all_alive_lock, NULL);
+	if (check != 0)
+	{
+		free(share->forks);
+		free(share->fork_locks);
+		while (--j >= 0)
+			pthread_mutex_destroy(share->fork_locks + j);
+		pthread_mutex_destroy(&share->print_lock);
+		return (EXIT_FAILURE);
+	}
 	share->all_alive = ALL_ALIVE;
 	return (EXIT_SUCCESS);
 }
@@ -77,6 +105,7 @@ t_philo	*init_philos(t_share *share)
 	philos = (t_philo *)malloc((share->n_philo) * sizeof(t_philo));
 	if (philos == NULL)
 		return (NULL);
+	memset(philos, 0, sizeof(t_share) * share->n_philo);
 	i = 0;
 	while (i < share->n_philo)
 	{
@@ -96,7 +125,6 @@ t_philo	*init_philos(t_share *share)
 			philos[i].first_fork = (i + 1) % share->n_philo;
 		}
 		philos[i].status = TO_EAT;
-		// pthread_mutex_init(&(philos[i].alive_lock), NULL);
 		i++;
 	}
 	return (philos);

@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 10:33:20 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/10 15:17:24 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,7 @@ int	main(int argc, char **argv)
 	philos = init_philos(share);
 	if (philos == NULL)
 	{
-		free(share->forks);
-		free(share->fork_locks);
-		free(share);
+		clear_share(share);
 		return (perror_n_return(EXIT_FAILURE));
 	}
 	gettimeofday(&(share->t_start), NULL);
@@ -56,6 +54,15 @@ int	main(int argc, char **argv)
 			return (EXIT_FAILURE);
 		i += 2;
 	}
+	// i = 0;
+	// while (i < share->n_philo)
+	// {
+	// 	check = pthread_create(&((philos + i)->thread), NULL,
+	// 			philo_routine, (philos + i));
+	// 	if (check != 0)
+	// 		return (EXIT_FAILURE);
+	// 	i += 1;
+	// }
 	if (share->n_eat > -1)
 		check = pthread_create(&share->monitoring, NULL,
 				monitoring_routine, philos);
@@ -69,6 +76,7 @@ int	main(int argc, char **argv)
 	}
 	if (share->n_eat > -1)
 		check = pthread_join(share->monitoring, NULL);
+	clear_all(share, philos);
 	return (EXIT_SUCCESS);
 }
 	// the followings are test code for gettimeofday();
@@ -80,6 +88,26 @@ int	main(int argc, char **argv)
 	// printf("start.tv_sec:%ld|tv_usec:%d\n", start.tv_sec, start.tv_usec);
 	// printf("time interval in sec:%ld\n", end.tv_sec - start.tv_sec);
 	// printf("time interval in usec:%d\n", end.tv_usec - start.tv_usec);
+
+void	clear_all(t_share *share, t_philo *philos)
+{
+	free(philos);
+	clear_share(share);
+}
+
+void	clear_share(t_share *share)
+{
+	int	i;
+
+	i = 0;
+	free(share->forks);
+	while (i < share->n_philo)
+		pthread_mutex_destroy(share->fork_locks + i++);
+	free(share->fork_locks);
+	pthread_mutex_destroy(&share->print_lock);
+	pthread_mutex_destroy(&share->all_alive_lock);
+	free(share);
+}
 
 void test_print_share(t_share *share)
 {

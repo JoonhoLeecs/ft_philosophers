@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 11:31:50 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/10 14:33:27 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ typedef struct s_share
 	t_timeval	t_start;
 	int			*forks;
 	t_mutex		*fork_locks;
-	t_mutex		print_lock;
 	t_all_alive	all_alive;
 	t_mutex		all_alive_lock;
+	t_mutex		print_lock;
 	t_pthread	monitoring;
 }				t_share;
 
@@ -78,7 +78,6 @@ typedef struct s_philo
 	int			first_fork;
 	int			second_fork;
 	t_alive		alive;
-	// t_mutex		alive_lock;
 	t_status	status;
 	t_timeval	t_last_eat;
 	t_timeval	t_last_sleep;
@@ -95,7 +94,7 @@ void	take_forks(t_philo *philo);
 void	put_back_forks(t_philo *philo);
 void	philo_sleep(t_philo *philo);
 void	philo_think(t_philo *philo);
-int refresh_unit_time(t_philo *philo, t_timeval time);
+int		refresh_unit_time(t_philo *philo, t_timeval time);
 
 void	*monitoring_routine(void *arg);
 
@@ -104,7 +103,10 @@ int		perror_n_return(int exit_status);
 long	get_utime_diff(t_timeval time, t_timeval ref);
 long	get_mtime_diff(t_timeval time, t_timeval ref);
 int		philo_max(int a, int b);
-long		philo_min(long a, long b);
+long	philo_min(long a, long b);
+
+void	clear_all(t_share *share, t_philo *philos);
+void	clear_share(t_share *share);
 
 void	test_print_share(t_share *share);
 
