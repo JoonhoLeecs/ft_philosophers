@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:27:56 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 17:01:03 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 09:41:53 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ int	save_args(t_share *share, int *n, int i)
 	share->n_eat = -1;
 	if (i > 5)
 		share->n_eat = n[4];
+	share->forks_sem = sem_open("/forks.sem", O_CREAT || O_EXCL, 0644, share->n_philo);
 	share->all_alive = ALL_ALIVE;
 	check = 0;
 	j = 0;

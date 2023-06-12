@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/12 08:26:45 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 21:27:29 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ void	*philo_routine(void *arg)
 {
 	t_philo	*philo;
 	void	(*philo_actions[3])(t_philo *);
+	// int		unit_time;
+	// t_timeval	time;
 
 	philo = (t_philo *)arg;
 	philo_actions[0] = &philo_eat;
@@ -24,9 +26,18 @@ void	*philo_routine(void *arg)
 	gettimeofday(&(philo->t_last_eat), NULL);
 	philo->t_last_sleep = philo->t_last_eat;
 	if (philo->ind % 2 == 0)
-		usleep(philo_max(100, philo->share->n_philo * 3 / 2));
+		usleep(philo_max(100, philo->share->n_philo * 5));
 	while (philo->alive != DEAD)
+	{
+		// gettimeofday(&time, NULL);
+		// unit_time = T_UNIT / 2;
+		// if (check_starvation(philo, time) == DEAD)
+		// 	continue ;
+		// unit_time = refresh_unit_time(philo, time);
 		philo_actions[(int)philo->status](philo);
+
+		// usleep(unit_time);
+	}
 	return (NULL);
 }
 // printf("last_eat:  %ld|%d sec\n", philo->t_last_eat.tv_sec,
@@ -36,25 +47,27 @@ void	*philo_routine(void *arg)
 
 int	check_starvation(t_philo *philo, t_timeval time)
 {
-	t_all_alive	all_alive;
+	// t_all_alive	all_alive;
 
-	pthread_mutex_lock(&philo->share->all_alive_lock);
-	all_alive = philo->share->all_alive;
-	pthread_mutex_unlock(&philo->share->all_alive_lock);
-	if (all_alive != ALL_ALIVE)
+	// pthread_mutex_lock(&philo->share->all_alive_lock);
+	// all_alive = philo->share->all_alive;
+	// pthread_mutex_unlock(&philo->share->all_alive_lock);
+	// if (all_alive != ALL_ALIVE)
+	// {
+	// 	put_back_forks(philo);
+	// 	philo->alive = DEAD;
+	// }
+	if (get_utime_diff(time, philo->t_last_eat) > philo->share->t_die)
 	{
-		put_back_forks(philo);
-		philo->alive = DEAD;
-	}
-	else if (get_utime_diff(time, philo->t_last_eat) > philo->share->t_die)
-	{
-		pthread_mutex_lock(&philo->share->print_lock);
-		printf("%ld %d died\n",
-			get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
-		pthread_mutex_unlock(&philo->share->print_lock);
-		pthread_mutex_lock(&philo->share->all_alive_lock);
-		philo->share->all_alive = ANY_DEAD;
-		pthread_mutex_unlock(&philo->share->all_alive_lock);
+		philo_printf(get_mtime_diff(time, philo->share->t_start),
+			DIE, philo);
+		// pthread_mutex_lock(&philo->share->print_lock);
+		// printf("%ld %d died\n",
+		// 	get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
+		// pthread_mutex_unlock(&philo->share->print_lock);
+		// pthread_mutex_lock(&philo->share->all_alive_lock);
+		// philo->share->all_alive = ANY_DEAD;
+		// pthread_mutex_unlock(&philo->share->all_alive_lock);
 		put_back_forks(philo);
 		philo->alive = DEAD;
 		pthread_mutex_lock(&philo->pub_alive_lock);
@@ -73,6 +86,7 @@ void	philo_eat(t_philo *philo)
 		&& (philo->status == EATING || philo->status == TO_EAT))
 	{
 		gettimeofday(&time, NULL);
+		unit_time = T_UNIT / 2;
 		if (check_starvation(philo, time) == DEAD)
 			return ;
 		unit_time = refresh_unit_time(philo, time);
@@ -83,11 +97,13 @@ void	philo_eat(t_philo *philo)
 		}
 		if (philo->status == TO_EAT && philo->n_forks == 2)
 		{
-			pthread_mutex_lock(&philo->share->print_lock);
-			gettimeofday(&time, NULL);
-			printf("%ld %d is eating\n",
-				get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
-			pthread_mutex_unlock(&philo->share->print_lock);
+			philo_printf(get_mtime_diff(time, philo->share->t_start),
+				EAT, philo);
+			// pthread_mutex_lock(&philo->share->print_lock);
+			// gettimeofday(&time, NULL);
+			// printf("%ld %d is eating\n",
+			// 	get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
+			// pthread_mutex_unlock(&philo->share->print_lock);
 			philo->t_last_eat = time;
 			philo->status = EATING;
 			continue ;
@@ -120,16 +136,19 @@ void	philo_sleep(t_philo *philo)
 		&& (philo->status == SLEEPING || philo->status == TO_SLEEP))
 	{
 		gettimeofday(&time, NULL);
+		unit_time = T_UNIT / 2;
 		if (check_starvation(philo, time) == DEAD)
 			return ;
 		unit_time = refresh_unit_time(philo, time);
 		if (philo->status == TO_SLEEP)
 		{
-			pthread_mutex_lock(&philo->share->print_lock);
-			gettimeofday(&time, NULL);
-			printf("%ld %d is sleeping\n",
-				get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
-			pthread_mutex_unlock(&philo->share->print_lock);
+			philo_printf(get_mtime_diff(time, philo->share->t_start),
+				SLEEP, philo);
+			// pthread_mutex_lock(&philo->share->print_lock);
+			// gettimeofday(&time, NULL);
+			// printf("%ld %d is sleeping\n",
+			// 	get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
+			// pthread_mutex_unlock(&philo->share->print_lock);
 			philo->t_last_sleep = time;
 			philo->status = SLEEPING;
 			continue ;
@@ -154,10 +173,12 @@ void	philo_think(t_philo *philo)
 		gettimeofday(&time, NULL);
 		if (check_starvation(philo, time) == DEAD)
 			return ;
-		pthread_mutex_lock(&philo->share->print_lock);
-		printf("%ld %d is thinking\n",
-			get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
-		pthread_mutex_unlock(&philo->share->print_lock);
+		philo_printf(get_mtime_diff(time, philo->share->t_start),
+			THINK, philo);
+		// pthread_mutex_lock(&philo->share->print_lock);
+		// printf("%ld %d is thinking\n",
+		// 	get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
+		// pthread_mutex_unlock(&philo->share->print_lock);
 		philo->status = TO_EAT;
 	}
 }
@@ -173,10 +194,12 @@ void	take_forks(t_philo *philo)
 		philo->n_forks += 1;
 		if (check_starvation(philo, after_lock) == DEAD)
 			return ;
-		pthread_mutex_lock(&philo->share->print_lock);
-		printf("%ld %d has taken a fork\n",
-			get_mtime_diff(after_lock, philo->share->t_start), philo->ind + 1);
-		pthread_mutex_unlock(&philo->share->print_lock);
+		philo_printf(get_mtime_diff(after_lock, philo->share->t_start),
+			FORK, philo);
+		// pthread_mutex_lock(&philo->share->print_lock);
+		// printf("%ld %d has taken a fork\n",
+		// 	get_mtime_diff(after_lock, philo->share->t_start), philo->ind + 1);
+		// pthread_mutex_unlock(&philo->share->print_lock);
 		*(philo->share->forks + philo->first_fork) = philo->ind;
 	}
 	if (philo->n_forks == 1 && philo->first_fork == philo->second_fork)
@@ -191,10 +214,12 @@ void	take_forks(t_philo *philo)
 		philo->n_forks += 1;
 		if (check_starvation(philo, after_lock) == DEAD)
 			return ;
-		pthread_mutex_lock(&philo->share->print_lock);
-		printf("%ld %d has taken a fork\n",
-			get_mtime_diff(after_lock, philo->share->t_start), philo->ind + 1);
-		pthread_mutex_unlock(&philo->share->print_lock);
+		philo_printf(get_mtime_diff(after_lock, philo->share->t_start),
+			FORK, philo);
+		// pthread_mutex_lock(&philo->share->print_lock);
+		// printf("%ld %d has taken a fork\n",
+		// 	get_mtime_diff(after_lock, philo->share->t_start), philo->ind + 1);
+		// pthread_mutex_unlock(&philo->share->print_lock);
 		*(philo->share->forks + philo->second_fork) = philo->ind;
 	}
 }
@@ -245,3 +270,36 @@ int	refresh_unit_time(t_philo *philo, t_timeval time)
 	else
 		return (T_UNIT);
 }
+
+void	philo_printf(long time, t_msg msg, t_philo *philo)
+{
+	t_all_alive	all_alive;
+
+	pthread_mutex_lock(&philo->share->all_alive_lock);
+	all_alive = philo->share->all_alive;
+	if (all_alive != ANY_DEAD)
+	{
+		// pthread_mutex_lock(&philo->share->print_lock);
+		if (msg == DIE)
+		{
+			printf("%ld %d died\n", time, philo->ind + 1);
+			philo->share->all_alive = ANY_DEAD;
+		}
+		else if (msg == THINK)
+			printf("%ld %d is thinking\n", time, philo->ind + 1);
+		else if (msg == FORK)
+			printf("%ld %d has taken a fork\n", time, philo->ind + 1);
+		else if (msg == EAT)
+			printf("%ld %d is eating\n", time, philo->ind + 1);
+		else if (msg == SLEEP)
+			printf("%ld %d is sleeping\n", time, philo->ind + 1);
+		// pthread_mutex_unlock(&philo->share->print_lock);
+	}
+	if (all_alive != ALL_ALIVE)
+	{
+		put_back_forks(philo);
+		philo->alive = DEAD;
+	}
+	pthread_mutex_unlock(&philo->share->all_alive_lock);
+}
+

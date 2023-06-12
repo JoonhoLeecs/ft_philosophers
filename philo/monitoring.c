@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 10:08:22 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/12 08:41:46 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 14:23:10 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 void	*monitoring_routine(void *arg)
 {
 	t_philo	*philos;
+	t_alive	pub_alive;
 	int		i;
 	int		check;
 
@@ -28,15 +29,21 @@ void	*monitoring_routine(void *arg)
 		while (i < philos->share->n_philo)
 		{
 			pthread_mutex_lock(&(philos[i].pub_alive_lock));
-			if (philos[i].pub_alive == DONE_EAT)
-				check++;
+			pub_alive = philos[i].pub_alive;
 			pthread_mutex_unlock(&(philos[i].pub_alive_lock));
+			if (pub_alive == DONE_EAT)
+				check++;
+			else if (pub_alive == DEAD)
+				check = philos->share->n_philo + 1;
 			i++;
 		}
 		usleep(1 * T_UNIT);
 	}
-	pthread_mutex_lock(&philos->share->all_alive_lock);
-	philos->share->all_alive = ALL_DONE_EAT;
-	pthread_mutex_unlock(&philos->share->all_alive_lock);
+	if (check == philos->share->n_philo)
+	{
+		pthread_mutex_lock(&philos->share->all_alive_lock);
+		philos->share->all_alive = ALL_DONE_EAT;
+		pthread_mutex_unlock(&philos->share->all_alive_lock);
+	}
 	return (NULL);
 }

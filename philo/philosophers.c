@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/12 08:35:36 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 21:22:29 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ int	main(int argc, char **argv)
 	gettimeofday(&(share->t_start), NULL);
 	check = 0;
 	i = 1;
+	if (i >= share->n_philo)
+		i = odd_even_iterator(i, share->n_philo);
 	while (i < share->n_philo)
 	{
 		check = pthread_create(&((philos + i)->thread), NULL,

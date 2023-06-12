@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 18:50:57 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 09:38:06 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,12 @@
 # include <string.h>
 # include <unistd.h>
 # include <sys/time.h>
-
-
-# include <pthread.h>
 # include <stdio.h>
+# include <fcntl.h>
+# include <sys/stat.h>
+# include <semaphore.h>
+
+// # include <pthread.h>
 // need to check headers above after compeletion
 
 # define T_UNIT 17
@@ -50,8 +52,8 @@ typedef enum e_all_alive
 }	t_all_alive;
 
 typedef struct timeval	t_timeval;
-typedef pthread_mutex_t	t_mutex;
-typedef pthread_t		t_pthread;
+typedef sem_t			t_sem;
+// typedef pthread_t		t_pthread;
 
 typedef struct s_share
 {
@@ -61,7 +63,7 @@ typedef struct s_share
 	long		t_sleep;
 	int			n_eat;
 	t_timeval	t_start;
-	// int			*forks;
+	t_sem		*forks_sem;
 	// t_mutex		*fork_locks;
 	t_all_alive	all_alive;
 	// t_mutex		all_alive_lock;
@@ -99,7 +101,6 @@ void	philo_think(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
 
 int		parent(t_share *share, t_philo *philos, int ind);
-	// void	*monitoring_routine(void *arg);
 
 int		philo_atoi(const char *str);
 int		perror_n_return(int exit_status);

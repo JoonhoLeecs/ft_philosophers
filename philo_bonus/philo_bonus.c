@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 17:06:04 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 09:10:58 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ int	main(int argc, char **argv)
 	share = check_init_args(argc, argv);
 	if (share == NULL)
 		return (perror_n_return(EXIT_FAILURE));
-	// test_print_share(share);
 	philos = init_philos(share);
 	if (philos == NULL)
 	{

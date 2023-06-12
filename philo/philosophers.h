@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/12 08:21:29 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 21:03:13 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <stdio.h>
 // need to check headers above after compeletion
 
-# define T_UNIT 17
+# define T_UNIT 31
 # define T_OFFSET 200
 
 typedef enum e_status
@@ -32,6 +32,7 @@ typedef enum e_status
 	TO_THINK,
 	EATING,
 	SLEEPING,
+	// THINKING,
 }	t_status;
 
 typedef enum e_alive
@@ -47,6 +48,15 @@ typedef enum e_all_alive
 	ANY_DEAD,
 	ALL_ALIVE,
 }	t_all_alive;
+
+typedef enum e_msg
+{
+	DIE = 0,
+	THINK,
+	FORK,
+	EAT,
+	SLEEP,
+}	t_msg;
 
 typedef struct timeval	t_timeval;
 typedef pthread_mutex_t	t_mutex;
@@ -107,6 +117,7 @@ long	get_utime_diff(t_timeval time, t_timeval ref);
 long	get_mtime_diff(t_timeval time, t_timeval ref);
 int		philo_max(int a, int b);
 long	philo_min(long a, long b);
+void	philo_printf(long time, t_msg msg, t_philo *philo);
 
 void	clear_all(t_share *share, t_philo *philos);
 void	clear_share(t_share *share);
