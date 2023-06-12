@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 15:49:34 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 08:26:45 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,11 @@ void	*philo_routine(void *arg)
 	philo_actions[1] = &philo_sleep;
 	philo_actions[2] = &philo_think;
 	gettimeofday(&(philo->t_last_eat), NULL);
-	gettimeofday(&(philo->t_last_sleep), NULL);
+	philo->t_last_sleep = philo->t_last_eat;
 	if (philo->ind % 2 == 0)
-		// usleep(philo_max(100, philo->share->n_philo * 2 + philo->ind));
 		usleep(philo_max(100, philo->share->n_philo * 3 / 2));
 	while (philo->alive != DEAD)
-	{
 		philo_actions[(int)philo->status](philo);
-	}
 	return (NULL);
 }
 // printf("last_eat:  %ld|%d sec\n", philo->t_last_eat.tv_sec,
@@ -39,12 +36,15 @@ void	*philo_routine(void *arg)
 
 int	check_starvation(t_philo *philo, t_timeval time)
 {
-	if (philo->share->all_alive != ALL_ALIVE)
+	t_all_alive	all_alive;
+
+	pthread_mutex_lock(&philo->share->all_alive_lock);
+	all_alive = philo->share->all_alive;
+	pthread_mutex_unlock(&philo->share->all_alive_lock);
+	if (all_alive != ALL_ALIVE)
 	{
 		put_back_forks(philo);
-		// pthread_mutex_lock(&philo->alive_lock);
 		philo->alive = DEAD;
-		// pthread_mutex_unlock(&philo->alive_lock);
 	}
 	else if (get_utime_diff(time, philo->t_last_eat) > philo->share->t_die)
 	{
@@ -56,9 +56,10 @@ int	check_starvation(t_philo *philo, t_timeval time)
 		philo->share->all_alive = ANY_DEAD;
 		pthread_mutex_unlock(&philo->share->all_alive_lock);
 		put_back_forks(philo);
-		// pthread_mutex_lock(&philo->alive_lock);
 		philo->alive = DEAD;
-		// pthread_mutex_unlock(&philo->alive_lock);
+		pthread_mutex_lock(&philo->pub_alive_lock);
+		philo->pub_alive = DEAD;
+		pthread_mutex_unlock(&philo->pub_alive_lock);
 	}
 	return (philo->alive);
 }
@@ -83,7 +84,7 @@ void	philo_eat(t_philo *philo)
 		if (philo->status == TO_EAT && philo->n_forks == 2)
 		{
 			pthread_mutex_lock(&philo->share->print_lock);
-				gettimeofday(&time, NULL);
+			gettimeofday(&time, NULL);
 			printf("%ld %d is eating\n",
 				get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
 			pthread_mutex_unlock(&philo->share->print_lock);
@@ -98,9 +99,10 @@ void	philo_eat(t_philo *philo)
 				philo->n_eat += 1;
 			if (philo->share->n_eat > -1 && philo->n_eat == philo->share->n_eat)
 			{
-				// pthread_mutex_lock(&philo->alive_lock);
 				philo->alive = DONE_EAT;
-				// pthread_mutex_unlock(&philo->alive_lock);
+				pthread_mutex_lock(&philo->pub_alive_lock);
+				philo->pub_alive = DONE_EAT;
+				pthread_mutex_unlock(&philo->pub_alive_lock);
 			}
 			philo->status = TO_SLEEP;
 			return ;
@@ -124,7 +126,7 @@ void	philo_sleep(t_philo *philo)
 		if (philo->status == TO_SLEEP)
 		{
 			pthread_mutex_lock(&philo->share->print_lock);
-				gettimeofday(&time, NULL);
+			gettimeofday(&time, NULL);
 			printf("%ld %d is sleeping\n",
 				get_mtime_diff(time, philo->share->t_start), philo->ind + 1);
 			pthread_mutex_unlock(&philo->share->print_lock);
@@ -199,13 +201,6 @@ void	take_forks(t_philo *philo)
 
 void	put_back_forks(t_philo *philo)
 {
-	// if (philo->n_forks == 2)
-	// {
-	// 	*(philo->share->forks + philo->second_fork) = 0;
-	// 	pthread_mutex_unlock(philo->share->fork_locks + philo->second_fork);
-	// 	philo->n_forks -= 1;
-	// }
-	// if (philo->n_forks == 1)
 	if (philo->n_forks == 2)
 	{
 		*(philo->share->forks + philo->first_fork) = 0;
@@ -221,6 +216,13 @@ void	put_back_forks(t_philo *philo)
 		philo->n_forks -= 1;
 	}
 }
+	// if (philo->n_forks == 2)
+	// {
+	// 	*(philo->share->forks + philo->second_fork) = 0;
+	// 	pthread_mutex_unlock(philo->share->fork_locks + philo->second_fork);
+	// 	philo->n_forks -= 1;
+	// }
+	// if (philo->n_forks == 1)
 
 int	refresh_unit_time(t_philo *philo, t_timeval time)
 {

@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:27:56 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 14:57:32 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 08:30:59 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,17 +101,18 @@ t_philo	*init_philos(t_share *share)
 {
 	t_philo	*philos;
 	int		i;
+	int		check;
 
 	philos = (t_philo *)malloc((share->n_philo) * sizeof(t_philo));
 	if (philos == NULL)
 		return (NULL);
 	memset(philos, 0, sizeof(t_share) * share->n_philo);
 	i = 0;
-	while (i < share->n_philo)
+	check = 0;
+	while (i < share->n_philo && check == 0)
 	{
 		philos[i].share = share;
 		philos[i].ind = i;
-		philos[i].alive = ALIVE;
 		philos[i].n_eat = 0;
 		philos[i].n_forks = 0;
 		if (i % 2 == 0)
@@ -125,7 +126,18 @@ t_philo	*init_philos(t_share *share)
 			philos[i].first_fork = (i + 1) % share->n_philo;
 		}
 		philos[i].status = TO_EAT;
+		philos[i].alive = ALIVE;
+		philos[i].pub_alive = ALIVE;
+		check = pthread_mutex_init(&(philos[i].pub_alive_lock), NULL);
 		i++;
+	}
+	printf("done philo init:%d\n", check);
+	if (check != 0)
+	{
+		while (--i > -1)
+			pthread_mutex_destroy(&(philos[i].pub_alive_lock));
+		free(philos);
+		return (NULL);
 	}
 	return (philos);
 }

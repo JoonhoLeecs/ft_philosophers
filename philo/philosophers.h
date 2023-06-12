@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 17:07:51 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 08:21:29 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,8 +77,10 @@ typedef struct s_philo
 	int			n_forks;
 	int			first_fork;
 	int			second_fork;
-	t_alive		alive;
 	t_status	status;
+	t_alive		alive;
+	t_alive		pub_alive;
+	t_mutex		pub_alive_lock;
 	t_timeval	t_last_eat;
 	t_timeval	t_last_sleep;
 }				t_philo;

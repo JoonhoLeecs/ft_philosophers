@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 10:08:22 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 11:01:54 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 08:41:46 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	*monitoring_routine(void *arg)
 	int		check;
 
 	philos = (t_philo *)arg;
-	usleep(philo_max(100, philos->share->n_philo * 3));
+	usleep(philo_max(T_OFFSET, philos->share->n_philo * 3));
 	check = 0;
 	while (check < philos->share->n_philo)
 	{
@@ -27,8 +27,10 @@ void	*monitoring_routine(void *arg)
 		i = 0;
 		while (i < philos->share->n_philo)
 		{
-			if (philos[i].alive == DONE_EAT)
+			pthread_mutex_lock(&(philos[i].pub_alive_lock));
+			if (philos[i].pub_alive == DONE_EAT)
 				check++;
+			pthread_mutex_unlock(&(philos[i].pub_alive_lock));
 			i++;
 		}
 		usleep(1 * T_UNIT);

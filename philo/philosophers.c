@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 17:08:01 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/12 08:35:36 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,14 @@ int	odd_even_iterator(int i, int n_philo)
 
 void	clear_all(t_share *share, t_philo *philos)
 {
+	int	i;
+
+	i = 0;
+	while (i < share->n_philo)
+	{
+		pthread_mutex_destroy(&(philos[i].pub_alive_lock));
+		i++;
+	}
 	free(philos);
 	clear_share(share);
 }
