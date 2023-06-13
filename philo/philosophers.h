@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/13 15:25:01 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/13 19:54:19 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <string.h>
 # include <stdio.h>
 
-# define T_UNIT 41
+# define T_UNIT 31
 # define T_OFFSET 100
 
 typedef enum e_status
