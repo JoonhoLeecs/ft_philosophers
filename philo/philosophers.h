@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/12 21:03:13 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/13 08:06:23 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <stdio.h>
 // need to check headers above after compeletion
 
-# define T_UNIT 31
+# define T_UNIT 17
 # define T_OFFSET 200
 
 typedef enum e_status
@@ -32,7 +32,7 @@ typedef enum e_status
 	TO_THINK,
 	EATING,
 	SLEEPING,
-	// THINKING,
+	THINKING,
 }	t_status;
 
 typedef enum e_alive
@@ -51,11 +51,13 @@ typedef enum e_all_alive
 
 typedef enum e_msg
 {
-	DIE = 0,
+	NONE = 0,
+	DIE,
 	THINK,
 	FORK,
 	EAT,
 	SLEEP,
+	SKIP,
 }	t_msg;
 
 typedef struct timeval	t_timeval;
@@ -88,6 +90,7 @@ typedef struct s_philo
 	int			first_fork;
 	int			second_fork;
 	t_status	status;
+	t_msg		msg;
 	t_alive		alive;
 	t_alive		pub_alive;
 	t_mutex		pub_alive_lock;
@@ -102,11 +105,11 @@ int		odd_even_iterator(int i, int n_philo);
 
 void	*philo_routine(void *arg);
 int		check_starvation(t_philo *philo, t_timeval time);
-void	philo_eat(t_philo *philo);
-void	take_forks(t_philo *philo);
+int		philo_eat(t_philo *philo, t_timeval time);
+int		philo_sleep(t_philo *philo, t_timeval time);
+int		philo_think(t_philo *philo, t_timeval time);
+int		take_forks(t_philo *philo, t_timeval time);
 void	put_back_forks(t_philo *philo);
-void	philo_sleep(t_philo *philo);
-void	philo_think(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
 
 void	*monitoring_routine(void *arg);

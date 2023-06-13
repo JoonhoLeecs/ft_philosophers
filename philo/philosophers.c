@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/12 21:22:29 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/13 08:48:15 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,9 @@ int	main(int argc, char **argv)
 	}
 	gettimeofday(&(share->t_start), NULL);
 	check = 0;
-	i = 1;
-	if (i >= share->n_philo)
-		i = odd_even_iterator(i, share->n_philo);
+	i = (share->n_philo > 1) * 1;
+	// if (i >= share->n_philo)
+	// 	i = odd_even_iterator(i, share->n_philo);
 	while (i < share->n_philo)
 	{
 		check = pthread_create(&((philos + i)->thread), NULL,
@@ -46,9 +46,15 @@ int	main(int argc, char **argv)
 			return (EXIT_FAILURE);
 		i = odd_even_iterator(i, share->n_philo);
 	}
-	if (share->n_eat > -1)
+	if (share->n_eat > -1 && check == 0)
 		check = pthread_create(&share->monitoring, NULL,
 				monitoring_routine, philos);
+	else if (check != 0)
+	{
+		pthread_mutex_lock(&philos->share->all_alive_lock);
+		philos->share->all_alive = ALL_DONE_EAT;
+		pthread_mutex_unlock(&philos->share->all_alive_lock);
+	}
 	i = 0;
 	while (i < share->n_philo)
 	{

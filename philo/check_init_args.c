@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:27:56 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/12 20:54:44 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/13 08:14:51 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ t_philo	*init_philos(t_share *share)
 			philos[i].second_fork = i;
 			philos[i].first_fork = (i + 1) % share->n_philo;
 		}
-		philos[i].status = TO_EAT;
+		philos[i].status = THINKING;
 		philos[i].alive = ALIVE;
 		philos[i].pub_alive = ALIVE;
 		check = pthread_mutex_init(&(philos[i].pub_alive_lock), NULL);
