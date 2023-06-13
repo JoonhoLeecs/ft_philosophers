@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/13 08:06:23 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/13 12:31:46 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 // need to check headers above after compeletion
 
 # define T_UNIT 17
-# define T_OFFSET 200
+# define T_OFFSET 100
 
 typedef enum e_status
 {
@@ -76,7 +76,7 @@ typedef struct s_share
 	t_mutex		*fork_locks;
 	t_all_alive	all_alive;
 	t_mutex		all_alive_lock;
-	t_mutex		print_lock;
+	// t_mutex		print_lock;
 	t_pthread	monitoring;
 }				t_share;
 
@@ -98,12 +98,25 @@ typedef struct s_philo
 	t_timeval	t_last_sleep;
 }				t_philo;
 
+typedef struct s_monitor_env
+{
+	t_alive	pub_alive;
+	int		i;
+	int		check;
+}			t_monitor_env;
+
 t_share	*check_init_args(int argc, char **argv);
 int		save_args(t_share *share, int *n, int i);
+int		init_share_mutex(t_share *share);
 t_philo	*init_philos(t_share *share);
+void	init_philo_var(t_philo *philos, int i, t_share *share);
+int		thread_create(t_share *share, t_philo *philos, int *check);
 int		odd_even_iterator(int i, int n_philo);
+int		rev_iterator(int i, int n_philo);
 
 void	*philo_routine(void *arg);
+void	routine_init(t_philo *philo, \
+		int (*actions[])(t_philo *, t_timeval time));
 int		check_starvation(t_philo *philo, t_timeval time);
 int		philo_eat(t_philo *philo, t_timeval time);
 int		philo_sleep(t_philo *philo, t_timeval time);
@@ -111,8 +124,10 @@ int		philo_think(t_philo *philo, t_timeval time);
 int		take_forks(t_philo *philo, t_timeval time);
 void	put_back_forks(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
+void	philo_printf(long time, t_msg msg, t_philo *philo);
 
 void	*monitoring_routine(void *arg);
+void	check_all_done(int check, t_philo *philos);
 
 int		philo_atoi(const char *str);
 int		perror_n_return(int exit_status);
@@ -120,11 +135,8 @@ long	get_utime_diff(t_timeval time, t_timeval ref);
 long	get_mtime_diff(t_timeval time, t_timeval ref);
 int		philo_max(int a, int b);
 long	philo_min(long a, long b);
-void	philo_printf(long time, t_msg msg, t_philo *philo);
 
 void	clear_all(t_share *share, t_philo *philos);
 void	clear_share(t_share *share);
-
-void	test_print_share(t_share *share);
 
 #endif

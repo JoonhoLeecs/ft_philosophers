@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/13 08:50:48 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/13 10:09:27 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,7 @@ void	*philo_routine(void *arg)
 	t_timeval	time;
 
 	philo = (t_philo *)arg;
-	philo_actions[TO_EAT] = &philo_eat;
-	philo_actions[TO_SLEEP] = &philo_sleep;
-	philo_actions[TO_THINK] = &philo_think;
-	philo_actions[EATING] = &philo_eat;
-	philo_actions[SLEEPING] = &philo_sleep;
-	philo_actions[THINKING] = &philo_think;
-	gettimeofday(&(philo->t_last_eat), NULL);
-	philo->t_last_sleep = philo->t_last_eat;
-	if (philo->ind % 2 == 0)
-		usleep(philo_max(100, philo->share->n_philo * 5));
+	routine_init(philo, philo_actions);
 	while (philo->alive != DEAD)
 	{
 		gettimeofday(&time, NULL);
@@ -40,7 +31,6 @@ void	*philo_routine(void *arg)
 		philo->msg = philo_actions[(int)philo->status](philo, time);
 		if (philo->msg != NONE)
 		{
-			unit_time = T_UNIT;
 			if (philo->msg != SKIP)
 				philo_printf(get_mtime_diff(time, philo->share->t_start),
 					philo->msg, philo);
@@ -50,10 +40,21 @@ void	*philo_routine(void *arg)
 	}
 	return (NULL);
 }
-// printf("last_eat:  %ld|%d sec\n", philo->t_last_eat.tv_sec,
-// 	philo->t_last_eat.tv_usec);
-// printf("last_sleep:%ld|%d sec\n", philo->t_last_sleep.tv_sec,
-// 	philo->t_last_sleep.tv_usec);
+
+void	routine_init(t_philo *philo, \
+		int (*actions[])(t_philo *, t_timeval time))
+{
+	actions[TO_EAT] = &philo_eat;
+	actions[TO_SLEEP] = &philo_sleep;
+	actions[TO_THINK] = &philo_think;
+	actions[EATING] = &philo_eat;
+	actions[SLEEPING] = &philo_sleep;
+	actions[THINKING] = &philo_think;
+	gettimeofday(&(philo->t_last_eat), NULL);
+	philo->t_last_sleep = philo->t_last_eat;
+	if (philo->ind % 2 == 0)
+		usleep(philo_max(T_OFFSET, philo->share->n_philo * 5));
+}
 
 int	check_starvation(t_philo *philo, t_timeval time)
 {
@@ -174,8 +175,6 @@ int	refresh_unit_time(t_philo *philo, t_timeval time)
 
 	if (philo->status != EATING && philo->status != SLEEPING)
 		return (T_UNIT);
-	// if (philo->status == TO_EAT || philo->status == TO_SLEEP)
-	// 	return (T_UNIT / 2);
 	if (philo->status == EATING)
 		t_left_state = philo->share->t_eat
 			- get_utime_diff(time, philo->t_last_eat);
@@ -192,11 +191,8 @@ int	refresh_unit_time(t_philo *philo, t_timeval time)
 
 void	philo_printf(long time, t_msg msg, t_philo *philo)
 {
-	t_all_alive	all_alive;
-
 	pthread_mutex_lock(&philo->share->all_alive_lock);
-	all_alive = philo->share->all_alive;
-	if (all_alive != ANY_DEAD)
+	if (philo->share->all_alive != ANY_DEAD)
 	{
 		if (msg == DIE)
 		{
@@ -212,7 +208,7 @@ void	philo_printf(long time, t_msg msg, t_philo *philo)
 		else if (msg == SLEEP)
 			printf("%ld %d is sleeping\n", time, philo->ind + 1);
 	}
-	if (all_alive != ALL_ALIVE)
+	if (philo->share->all_alive != ALL_ALIVE)
 	{
 		put_back_forks(philo);
 		philo->alive = DEAD;

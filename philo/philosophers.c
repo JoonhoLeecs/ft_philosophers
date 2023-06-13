@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/13 08:48:15 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/13 12:32:33 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,33 @@
 void	check_leak(void)
 {
 	system("leaks philo");
+}
+
+int	thread_create(t_share *share, t_philo *philos, int *check)
+{
+	int	i;
+
+	*check = 0;
+	gettimeofday(&(share->t_start), NULL);
+	i = (share->n_philo > 1) * 1;
+	while (i < share->n_philo)
+	{
+		*check = pthread_create(&((philos + i)->thread), NULL,
+				philo_routine, (philos + i));
+		if (*check != 0)
+			return (i);
+		i = odd_even_iterator(i, share->n_philo);
+	}
+	if (share->n_eat > -1 && *check == 0)
+		*check = pthread_create(&share->monitoring, NULL,
+				monitoring_routine, philos);
+	else if (*check != 0)
+	{
+		pthread_mutex_lock(&philos->share->all_alive_lock);
+		philos->share->all_alive = ALL_DONE_EAT;
+		pthread_mutex_unlock(&philos->share->all_alive_lock);
+	}
+	return (i);
 }
 
 int	main(int argc, char **argv)
@@ -33,50 +60,17 @@ int	main(int argc, char **argv)
 		clear_share(share);
 		return (perror_n_return(EXIT_FAILURE));
 	}
-	gettimeofday(&(share->t_start), NULL);
-	check = 0;
-	i = (share->n_philo > 1) * 1;
-	// if (i >= share->n_philo)
-	// 	i = odd_even_iterator(i, share->n_philo);
-	while (i < share->n_philo)
+	i = rev_iterator(thread_create(share, philos, &check), share->n_philo);
+	while (i > -1)
 	{
-		check = pthread_create(&((philos + i)->thread), NULL,
-				philo_routine, (philos + i));
-		if (check != 0)
-			return (EXIT_FAILURE);
-		i = odd_even_iterator(i, share->n_philo);
-	}
-	if (share->n_eat > -1 && check == 0)
-		check = pthread_create(&share->monitoring, NULL,
-				monitoring_routine, philos);
-	else if (check != 0)
-	{
-		pthread_mutex_lock(&philos->share->all_alive_lock);
-		philos->share->all_alive = ALL_DONE_EAT;
-		pthread_mutex_unlock(&philos->share->all_alive_lock);
-	}
-	i = 0;
-	while (i < share->n_philo)
-	{
-		check = pthread_join((philos + i)->thread, NULL);
-		if (check != 0)
-			return (EXIT_FAILURE);
-		i++;
+		check += pthread_join((philos + i)->thread, NULL);
+		i = rev_iterator(i, share->n_philo);
 	}
 	if (share->n_eat > -1)
-		check = pthread_join(share->monitoring, NULL);
+		check += pthread_join(share->monitoring, NULL);
 	clear_all(share, philos);
-	return (EXIT_SUCCESS);
+	return (check);
 }
-	// the followings are test code for gettimeofday();
-	// t_timeval	start;
-	// t_timeval	end;
-
-	// gettimeofday(&start, NULL);
-	// gettimeofday(&end, NULL);
-	// printf("start.tv_sec:%ld|tv_usec:%d\n", start.tv_sec, start.tv_usec);
-	// printf("time interval in sec:%ld\n", end.tv_sec - start.tv_sec);
-	// printf("time interval in usec:%d\n", end.tv_usec - start.tv_usec);
 
 int	odd_even_iterator(int i, int n_philo)
 {
@@ -90,6 +84,23 @@ int	odd_even_iterator(int i, int n_philo)
 	}
 	else
 		result = i + 2;
+	return (result);
+}
+
+int	rev_iterator(int i, int n_philo)
+{
+	int	result;
+
+	if (i % 2 == 0)
+	{
+		result = i - 2;
+		if (result < 0 && (n_philo % 2 == 0))
+			result = n_philo - 1;
+		else if (result < 0 && (n_philo % 2 == 1))
+			result = n_philo - 2;
+	}
+	else
+		result = i - 2;
 	return (result);
 }
 
@@ -116,16 +127,6 @@ void	clear_share(t_share *share)
 	while (i < share->n_philo)
 		pthread_mutex_destroy(share->fork_locks + i++);
 	free(share->fork_locks);
-	pthread_mutex_destroy(&share->print_lock);
 	pthread_mutex_destroy(&share->all_alive_lock);
 	free(share);
-}
-
-void test_print_share(t_share *share)
-{
-	printf("n_philo:%d\n", share->n_philo);
-	printf("t_die:%ld\n", share->t_die);
-	printf("t_eat:%ld\n", share->t_eat);
-	printf("t_sleep:%ld\n", share->t_sleep);
-	printf("n_eat:%d\n", share->n_eat);
 }
