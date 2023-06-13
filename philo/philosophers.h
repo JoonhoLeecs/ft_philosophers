@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/13 12:31:46 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/13 15:25:01 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,9 @@
 # include <sys/time.h>
 # include <pthread.h>
 # include <string.h>
-
 # include <stdio.h>
-// need to check headers above after compeletion
 
-# define T_UNIT 17
+# define T_UNIT 41
 # define T_OFFSET 100
 
 typedef enum e_status
@@ -76,7 +74,6 @@ typedef struct s_share
 	t_mutex		*fork_locks;
 	t_all_alive	all_alive;
 	t_mutex		all_alive_lock;
-	// t_mutex		print_lock;
 	t_pthread	monitoring;
 }				t_share;
 
@@ -121,7 +118,7 @@ int		check_starvation(t_philo *philo, t_timeval time);
 int		philo_eat(t_philo *philo, t_timeval time);
 int		philo_sleep(t_philo *philo, t_timeval time);
 int		philo_think(t_philo *philo, t_timeval time);
-int		take_forks(t_philo *philo, t_timeval time);
+int		take_forks(t_philo *philo);
 void	put_back_forks(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
 void	philo_printf(long time, t_msg msg, t_philo *philo);

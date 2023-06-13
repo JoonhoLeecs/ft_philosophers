@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:27:56 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/13 10:26:37 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/13 14:56:16 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ t_share	*check_init_args(int argc, char **argv)
 	memset(share, 0, sizeof(t_share));
 	if (save_args(share, n, i))
 	{
-		free(share);
+		clear_share(share);
 		return (NULL);
 	}
 	return (share);
@@ -53,6 +53,7 @@ int	save_args(t_share *share, int *n, int i)
 	share->forks = (int *) malloc(sizeof (int) * share->n_philo);
 	if (share->forks == NULL)
 		return (EXIT_FAILURE);
+	memset(share->forks, 0, sizeof (int) * share->n_philo);
 	share->fork_locks = (t_mutex *) malloc(sizeof (t_mutex) * share->n_philo);
 	if (share->fork_locks == NULL)
 	{
@@ -109,7 +110,6 @@ t_philo	*init_philos(t_share *share)
 		check = pthread_mutex_init(&(philos[i].pub_alive_lock), NULL);
 		i++;
 	}
-	printf("done philo init:%d\n", check);
 	if (check != 0)
 	{
 		while (--i > -1)

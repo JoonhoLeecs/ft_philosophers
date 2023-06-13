@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/13 10:09:27 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/13 15:19:22 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ int	check_starvation(t_philo *philo, t_timeval time)
 	{
 		philo_printf(get_mtime_diff(time, philo->share->t_start),
 			DIE, philo);
-		put_back_forks(philo);
-		philo->alive = DEAD;
+		// put_back_forks(philo);
+		// philo->alive = DEAD;
 		pthread_mutex_lock(&philo->pub_alive_lock);
 		philo->pub_alive = DEAD;
 		pthread_mutex_unlock(&philo->pub_alive_lock);
@@ -116,51 +116,60 @@ int	philo_sleep(t_philo *philo, t_timeval time)
 
 int	philo_think(t_philo *philo, t_timeval time)
 {
+	t_timeval	temp;
+
+	temp = time;
 	if (philo->status == TO_THINK)
 	{
 		philo->status = THINKING;
 		return (THINK);
 	}
 	else
-		return (take_forks(philo, time));
+		return (take_forks(philo));
 }
 
-int	take_forks(t_philo *philo, t_timeval time)
+int	take_forks(t_philo *philo)
 {
-	if (philo->n_forks == 1 && philo->first_fork == philo->second_fork)
-		return (NONE);
+	int	fork_ind;
+	int	fork;
+
 	if (philo->n_forks == 0)
-		pthread_mutex_lock(philo->share->fork_locks + philo->first_fork);
+		fork_ind = philo->first_fork;
+	else if (philo->n_forks == 1)
+		fork_ind = philo->second_fork;
 	else
-		pthread_mutex_lock(philo->share->fork_locks + philo->second_fork);
-	gettimeofday(&time, NULL);
-	philo->n_forks += 1;
-	if (check_starvation(philo, time) == DEAD)
 		return (NONE);
-	philo_printf(get_mtime_diff(time, philo->share->t_start),
-		FORK, philo);
-	if (philo->n_forks == 0)
-		*(philo->share->forks + philo->first_fork) = philo->ind;
-	else
+	pthread_mutex_lock(philo->share->fork_locks + fork_ind);
+	fork = *(philo->share->forks + fork_ind);
+	if (fork == 0)
 	{
-		*(philo->share->forks + philo->second_fork) = philo->ind;
-		philo->status = TO_EAT;
+		*(philo->share->forks + fork_ind) = philo->ind + 1;
+		philo->n_forks += 1;
 	}
-	return (SKIP);
+	pthread_mutex_unlock(philo->share->fork_locks + fork_ind);
+	if (philo->n_forks == 2)
+		philo->status = TO_EAT;
+	if (fork == 0)
+		return (FORK);
+	else
+		return (NONE);
 }
 
 void	put_back_forks(t_philo *philo)
 {
 	if (philo->n_forks == 2)
 	{
+		pthread_mutex_lock(philo->share->fork_locks + philo->first_fork);
 		*(philo->share->forks + philo->first_fork) = 0;
 		pthread_mutex_unlock(philo->share->fork_locks + philo->first_fork);
+		pthread_mutex_lock(philo->share->fork_locks + philo->second_fork);
 		*(philo->share->forks + philo->second_fork) = 0;
 		pthread_mutex_unlock(philo->share->fork_locks + philo->second_fork);
 		philo->n_forks -= 2;
 	}
 	else if (philo->n_forks == 1)
 	{
+		pthread_mutex_lock(philo->share->fork_locks + philo->first_fork);
 		*(philo->share->forks + philo->first_fork) = 0;
 		pthread_mutex_unlock(philo->share->fork_locks + philo->first_fork);
 		philo->n_forks -= 1;
@@ -182,7 +191,7 @@ int	refresh_unit_time(t_philo *philo, t_timeval time)
 		t_left_state = philo->share->t_sleep
 			- get_utime_diff(time, philo->t_last_sleep);
 	t_left_die = philo->share->t_die - get_utime_diff(time, philo->t_last_eat);
-	t_left_min = philo_min(t_left_state, t_left_die) / 2;
+	t_left_min = (philo_min(t_left_state, t_left_die) * 2) / 3;
 	if (T_UNIT < t_left_min)
 		return ((int) t_left_min);
 	else
