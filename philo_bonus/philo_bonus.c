@@ -6,16 +6,11 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/12 09:10:58 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 07:58:29 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
-
-void	check_leak(void)
-{
-	system("leaks philo_bonus");
-}
 
 int	main(int argc, char **argv)
 {
@@ -39,7 +34,7 @@ int	main(int argc, char **argv)
 	{
 		pid = fork();
 		if (pid == -1)
-			return (EXIT_FAILURE);
+			break ;
 		else if (pid == 0)
 			return (philo_routine(philos + i));
 		else
@@ -50,6 +45,7 @@ int	main(int argc, char **argv)
 	}
 	return (parent(share, philos, i));
 }
+	// printf("philo_bonus.c:35|%d\n", i);
 
 void	clear_all(t_share *share, t_philo *philos)
 {
@@ -59,6 +55,15 @@ void	clear_all(t_share *share, t_philo *philos)
 
 void	clear_share(t_share *share)
 {
+	sem_close(share->forks_sem);
+	sem_unlink(share->forks_sem_name);
+	sem_close(share->print_sem);
+	sem_unlink(share->print_sem_name);
+	if (share->n_eat > -1)
+	{
+		sem_close(share->fulls_sem);
+		sem_unlink(share->fulls_sem_name);
+	}
 	free(share);
 }
 
@@ -76,21 +81,20 @@ int	odd_even_iterator(int i, int n_philo)
 		result = i + 2;
 	return (result);
 }
-	// int	i;
 
-	// i = 0;
-	// free(share->forks);
-	// while (i < share->n_philo)
-	// 	pthread_mutex_destroy(share->fork_locks + i++);
-	// free(share->fork_locks);
-	// pthread_mutex_destroy(&share->print_lock);
-	// pthread_mutex_destroy(&share->all_alive_lock);
-
-void test_print_share(t_share *share)
+int	rev_iterator(int i, int n_philo)
 {
-	printf("n_philo:%d\n", share->n_philo);
-	printf("t_die:%ld\n", share->t_die);
-	printf("t_eat:%ld\n", share->t_eat);
-	printf("t_sleep:%ld\n", share->t_sleep);
-	printf("n_eat:%d\n", share->n_eat);
+	int	result;
+
+	if (i % 2 == 0)
+	{
+		result = i - 2;
+		if (result < 0 && (n_philo % 2 == 0))
+			result = n_philo - 1;
+		else if (result < 0 && (n_philo % 2 == 1))
+			result = n_philo - 2;
+	}
+	else
+		result = i - 2;
+	return (result);
 }

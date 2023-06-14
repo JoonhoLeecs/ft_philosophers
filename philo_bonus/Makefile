@@ -26,6 +26,8 @@ parent_bonus.c
 
 BONUS_OBJS = $(BONUS_SRCS:.c=.o)
 
+all : $(NAME)
+
 bonus : $(NAME)
 
 $(NAME) : $(BONUS_OBJS) $(HEADER)
@@ -45,4 +47,4 @@ re :
 	$(MAKE) fclean
 	$(MAKE) all
 
-.PHONY : all clean fclean re
+.PHONY : all bonus clean fclean re

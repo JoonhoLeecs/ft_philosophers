@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 10:08:22 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 18:51:51 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 08:20:30 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,30 +18,56 @@ int	parent(t_share *share, t_philo *philos, int ind)
 	int		status;
 	int		pid;
 
-	usleep(philo_max(100, philos->share->n_philo * 3));
-	// check = 0;
-	// while (check < philos->share->n_philo)
-	// {
-	// 	check = 0;
+	if (ind < share->n_philo)
+	{
+		kill(0, SIGINT);
+		clear_all(share, philos);
+		return (EXIT_FAILURE);
+	}
+	usleep(philo_max(T_OFFSET, philos->share->n_philo * 5) + T_OFFSET);
+	if (share->n_eat > -1)
+		init_monitor(share, philos);
 	i = 0;
+	if (share->n_eat > -1)
+		i = -1;
 	while (i < philos->share->n_philo)
 	{
 		pid = waitpid(-1, &status, 0);
 		if (WIFEXITED(status))
-		{
-			if (WEXITSTATUS(status) == 0)
+			if (WEXITSTATUS(status) == SIGQUIT
+				|| WEXITSTATUS(status) == EXIT_FAILURE)
 				break ;
-			// else if (WEXITSTATUS(status) == 2)
-		}
-
 		i++;
 	}
-	i = ind;
-	// 	usleep(1 * T_UNIT);
-	// }
-	// pthread_mutex_lock(&philos->share->all_alive_lock);
-	philos->share->all_alive = ALL_DONE_EAT;
-	// pthread_mutex_unlock(&philos->share->all_alive_lock);
+	kill(0, SIGINT);
 	clear_all(share, philos);
 	return (EXIT_SUCCESS);
+}
+
+void	init_monitor(t_share *share, t_philo *philos)
+{
+	int	i;
+
+	share->pid_monitor = fork();
+	if (share->pid_monitor == -1)
+	{
+		clear_all(share, philos);
+		exit (EXIT_FAILURE);
+	}
+	else if (share->pid_monitor == 0)
+	{
+		i = 0;
+		while (i < share->n_philo)
+		{
+			sem_wait(share->fulls_sem);
+			i++;
+		}
+		sem_close(share->forks_sem);
+		sem_close(share->print_sem);
+		if (share->n_eat > -1)
+			sem_close(share->fulls_sem);
+		exit(SIGQUIT);
+	}
+	else
+		return ;
 }
