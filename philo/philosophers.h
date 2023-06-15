@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/14 10:24:10 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 13:18:07 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 
 # define T_UNIT 31
 # define T_OFFSET 100
+# define INT_MAX 2147483647
 
 typedef enum e_status
 {

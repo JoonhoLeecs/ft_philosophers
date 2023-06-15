@@ -2,8 +2,6 @@ NAME = philo
 
 CC = cc
 CFLAGS = -Werror -Wall -Wextra
-# CFLAGS = -Werror -Wall -Wextra -fsanitize=thread -g
-# CFLAGS = -Werror -Wall -Wextra -fsanitize=address -g
 LDFLAGS = -pthread
 
 MAKE = make
@@ -15,13 +13,13 @@ RMFLAGS = -rf
 HEADER = \
 philosophers.h
 
-# INCLUDES = -I./mandatory
-
 MANDATORY_SRCS = \
 check_init_args.c \
 philo_utils.c \
+philo_utils2.c \
 philosophers.c \
 philo_routine.c \
+philo_routine2.c \
 monitoring.c
 
 

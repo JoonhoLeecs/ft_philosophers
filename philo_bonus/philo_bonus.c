@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 12:13:16 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 13:40:45 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ int	main(int argc, char **argv)
 {
 	t_share	*share;
 	t_philo	*philos;
-	int		pid;
 	int		i;
 
 	share = check_init_args(argc, argv);
@@ -29,6 +28,15 @@ int	main(int argc, char **argv)
 		return (perror_n_return(EXIT_FAILURE));
 	}
 	gettimeofday(&(share->t_start), NULL);
+	i = fork_child_philos(share, philos);
+	return (parent(share, philos, i));
+}
+
+int	fork_child_philos(t_share *share, t_philo *philos)
+{
+	int	pid;
+	int	i;
+
 	i = (share->n_philo > 1) * 1;
 	while (i < share->n_philo)
 	{
@@ -43,27 +51,7 @@ int	main(int argc, char **argv)
 			i = odd_even_iterator(i, share->n_philo);
 		}
 	}
-	return (parent(share, philos, i));
-}
-
-void	clear_all(t_share *share, t_philo *philos)
-{
-	free(philos);
-	clear_share(share);
-}
-
-void	clear_share(t_share *share)
-{
-	sem_close(share->forks_sem);
-	sem_unlink(share->forks_sem_name);
-	sem_close(share->print_sem);
-	sem_unlink(share->print_sem_name);
-	if (share->n_eat > -1)
-	{
-		sem_close(share->fulls_sem);
-		sem_unlink(share->fulls_sem_name);
-	}
-	free(share);
+	return (i);
 }
 
 int	odd_even_iterator(int i, int n_philo)

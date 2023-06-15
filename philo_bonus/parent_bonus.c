@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 10:08:22 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 09:27:31 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 13:40:05 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,20 +27,13 @@ int	parent(t_share *share, t_philo *philos, int ind)
 	usleep(philo_max(T_OFFSET, philos->share->n_philo * 5) + T_OFFSET);
 	if (share->n_eat > -1)
 		init_monitor(share, philos);
-	i = 0;
-	if (share->n_eat > -1)
-		i = -1;
+	i = (share->n_eat > -1) * -1;
 	while (i < philos->share->n_philo)
 	{
 		pid = waitpid(-1, &status, 0);
 		if (WIFEXITED(status))
-			if (WEXITSTATUS(status) == SIGQUIT
-				|| WEXITSTATUS(status) == EXIT_FAILURE)
-				{
+			if (WEXITSTATUS(status) == 3 || WEXITSTATUS(status) == 1)
 				break ;
-				printf("got signal?\n");
-
-				}
 		i++;
 	}
 	kill(0, SIGINT);

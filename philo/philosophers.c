@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/13 19:54:30 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 13:18:40 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,31 +97,4 @@ int	rev_iterator(int i, int n_philo)
 	else
 		result = i - 2;
 	return (result);
-}
-
-void	clear_all(t_share *share, t_philo *philos)
-{
-	int	i;
-
-	i = 0;
-	while (i < share->n_philo)
-	{
-		pthread_mutex_destroy(&(philos[i].pub_alive_lock));
-		i++;
-	}
-	free(philos);
-	clear_share(share);
-}
-
-void	clear_share(t_share *share)
-{
-	int	i;
-
-	i = 0;
-	free(share->forks);
-	while (i < share->n_philo)
-		pthread_mutex_destroy(share->fork_locks + i++);
-	free(share->fork_locks);
-	pthread_mutex_destroy(&share->all_alive_lock);
-	free(share);
 }

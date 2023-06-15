@@ -6,12 +6,11 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:58:21 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/10 16:49:50 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 13:44:46 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
-#include <limits.h>
 
 int	philo_atoi(const char *str)
 {
@@ -40,14 +39,12 @@ int	philo_atoi(const char *str)
 	return ((int)nbr);
 }
 
-//print error on STDERR and return exit_status
 int	perror_n_return(int exit_status)
 {
 	write(STDERR_FILENO, "Error: invalid arguement\n", 26);
 	return (exit_status);
 }
 
-// return time passed since ref as microseconds
 long	get_utime_diff(t_timeval time, t_timeval ref)
 {
 	long	diff;
@@ -56,7 +53,6 @@ long	get_utime_diff(t_timeval time, t_timeval ref)
 	return (diff);
 }
 
-// return time passed since ref as milliseconds
 long	get_mtime_diff(t_timeval time, t_timeval ref)
 {
 	long	diff;
@@ -64,20 +60,4 @@ long	get_mtime_diff(t_timeval time, t_timeval ref)
 	diff = (time.tv_sec - ref.tv_sec) * 1000
 		+ (time.tv_usec - ref.tv_usec) / 1000;
 	return (diff);
-}
-
-int	philo_max(int a, int b)
-{
-	if (a > b)
-		return (a);
-	else
-		return (b);
-}
-
-long	philo_min(long a, long b)
-{
-	if (a > b)
-		return (b);
-	else
-		return (a);
 }

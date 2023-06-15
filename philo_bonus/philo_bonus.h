@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 09:23:01 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 14:37:08 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 
 # define T_UNIT 31
 # define T_OFFSET 200
+# define INT_MAX 2147483647
 
 typedef enum e_status
 {
@@ -107,13 +108,17 @@ typedef struct s_philo
 
 t_share	*check_init_args(int argc, char **argv);
 int		save_args(t_share *share, int *n, int i);
+int		init_sems(t_share *share);
+int		init_fulls_sem(t_share *share);
 t_philo	*init_philos(t_share *share);
+int		fork_child_philos(t_share *share, t_philo *philos);
 int		odd_even_iterator(int i, int n_philo);
 int		rev_iterator(int i, int n_philo);
 
 int		philo_routine(t_philo *philo);
 void	routine_init(t_philo *philo,
 			int (*actions[])(t_philo *, t_timeval time));
+void	*check_forks(void *arg);
 int		check_starvation(t_philo *philo, t_timeval time);
 int		philo_eat(t_philo *philo, t_timeval time);
 int		philo_sleep(t_philo *philo, t_timeval time);
@@ -122,7 +127,6 @@ int		take_forks(t_philo *philo, t_timeval time);
 void	put_back_forks(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
 void	philo_printf(long time, t_msg msg, t_philo *philo);
-void	*check_forks(void *arg);
 
 int		parent(t_share *share, t_philo *philos, int ind);
 void	init_monitor(t_share *share, t_philo *philos);
@@ -136,7 +140,5 @@ long	philo_min(long a, long b);
 
 void	clear_all(t_share *share, t_philo *philos);
 void	clear_share(t_share *share);
-
-// void	test_print_share(t_share *share);
 
 #endif
