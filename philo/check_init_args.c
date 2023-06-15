@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:27:56 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/13 19:53:45 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 09:03:00 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ t_philo	*init_philos(t_share *share)
 	philos = (t_philo *)malloc((share->n_philo) * sizeof(t_philo));
 	if (philos == NULL)
 		return (NULL);
-	memset(philos, 0, sizeof(t_share) * share->n_philo);
+	memset(philos, 0, sizeof(t_philo) * share->n_philo);
 	i = 0;
 	check = 0;
 	while (i < share->n_philo && check == 0)

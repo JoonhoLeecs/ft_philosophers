@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 07:56:58 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 09:23:01 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <sys/stat.h>
 # include <semaphore.h>
 # include <signal.h>
+# include <pthread.h>
 
 // # include <pthread.h>
 // need to check headers above after compeletion
@@ -66,7 +67,8 @@ typedef enum e_msg
 
 typedef struct timeval	t_timeval;
 typedef sem_t			t_sem;
-// typedef pthread_t		t_pthread;
+typedef pthread_t		t_pthread;
+typedef pthread_mutex_t	t_mutex;
 
 typedef struct s_share
 {
@@ -97,6 +99,10 @@ typedef struct s_philo
 	t_alive		alive;
 	t_timeval	t_last_eat;
 	t_timeval	t_last_sleep;
+	t_pthread	forks_check;
+	t_mutex		two_forks_lock;
+	int			have_two_forks;
+	int			done_check_forks;
 }				t_philo;
 
 t_share	*check_init_args(int argc, char **argv);
@@ -116,6 +122,7 @@ int		take_forks(t_philo *philo, t_timeval time);
 void	put_back_forks(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
 void	philo_printf(long time, t_msg msg, t_philo *philo);
+void	*check_forks(void *arg);
 
 int		parent(t_share *share, t_philo *philos, int ind);
 void	init_monitor(t_share *share, t_philo *philos);

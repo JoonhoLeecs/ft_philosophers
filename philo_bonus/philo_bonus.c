@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 07:58:29 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 12:13:16 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	main(int argc, char **argv)
 		return (perror_n_return(EXIT_FAILURE));
 	}
 	gettimeofday(&(share->t_start), NULL);
-	i = 1;
+	i = (share->n_philo > 1) * 1;
 	while (i < share->n_philo)
 	{
 		pid = fork();
@@ -45,7 +45,6 @@ int	main(int argc, char **argv)
 	}
 	return (parent(share, philos, i));
 }
-	// printf("philo_bonus.c:35|%d\n", i);
 
 void	clear_all(t_share *share, t_philo *philos)
 {

@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 10:08:22 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 08:20:30 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 09:27:31 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,11 @@ int	parent(t_share *share, t_philo *philos, int ind)
 		if (WIFEXITED(status))
 			if (WEXITSTATUS(status) == SIGQUIT
 				|| WEXITSTATUS(status) == EXIT_FAILURE)
+				{
 				break ;
+				printf("got signal?\n");
+
+				}
 		i++;
 	}
 	kill(0, SIGINT);
