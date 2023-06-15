@@ -20,8 +20,8 @@ philo_utils2.c \
 philosophers.c \
 philo_routine.c \
 philo_routine2.c \
-monitoring.c
-
+monitoring.c \
+philo_print.c
 
 MANDATORY_OBJS = $(MANDATORY_SRCS:.c=.o)
 
@@ -31,7 +31,7 @@ $(NAME) : $(MANDATORY_OBJS) $(HEADER)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MANDATORY_OBJS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -c $< -o $@ $(INCLUDES)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c $< -o $@
 
 clean :
 	$(RM) $(RMFLAGS) $(MANDATORY_OBJS)

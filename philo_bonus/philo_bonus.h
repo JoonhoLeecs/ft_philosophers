@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 14:37:08 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 15:45:48 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,6 @@
 # include <semaphore.h>
 # include <signal.h>
 # include <pthread.h>
-
-// # include <pthread.h>
-// need to check headers above after compeletion
 
 # define T_UNIT 31
 # define T_OFFSET 200
@@ -137,6 +134,10 @@ long	get_utime_diff(t_timeval time, t_timeval ref);
 long	get_mtime_diff(t_timeval time, t_timeval ref);
 int		philo_max(int a, int b);
 long	philo_min(long a, long b);
+int		get_n_digit(long nbr);
+void	philo_put_nbr(char *str, long nbr, int n_digits);
+int		philo_put_rest(char *str, t_msg msg);
+void	philo_print(long time, int id, t_msg msg);
 
 void	clear_all(t_share *share, t_philo *philos);
 void	clear_share(t_share *share);

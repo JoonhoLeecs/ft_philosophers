@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 13:18:07 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 15:28:34 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,10 @@ long	get_utime_diff(t_timeval time, t_timeval ref);
 long	get_mtime_diff(t_timeval time, t_timeval ref);
 int		philo_max(int a, int b);
 long	philo_min(long a, long b);
+int		get_n_digit(long nbr);
+void	philo_put_nbr(char *str, long nbr, int n_digits);
+int		philo_put_rest(char *str, t_msg msg);
+void	philo_print(long time, int id, t_msg msg);
 
 void	clear_all(t_share *share, t_philo *philos);
 void	clear_share(t_share *share);

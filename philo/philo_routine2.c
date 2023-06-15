@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 14:34:43 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/15 15:44:08 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,10 @@ void	put_back_forks(t_philo *philo)
 {
 	if (philo->n_forks == 2)
 	{
-		*(philo->share->forks + philo->second_fork) = 0;
-		pthread_mutex_unlock(philo->share->fork_locks + philo->second_fork);
 		*(philo->share->forks + philo->first_fork) = 0;
 		pthread_mutex_unlock(philo->share->fork_locks + philo->first_fork);
+		*(philo->share->forks + philo->second_fork) = 0;
+		pthread_mutex_unlock(philo->share->fork_locks + philo->second_fork);
 		philo->n_forks -= 2;
 	}
 	else if (philo->n_forks == 1)
@@ -94,19 +94,9 @@ void	philo_printf(long time, t_msg msg, t_philo *philo)
 	pthread_mutex_lock(&philo->share->all_alive_lock);
 	if (philo->share->all_alive != ANY_DEAD)
 	{
+		philo_print(time, philo->ind + 1, msg);
 		if (msg == DIE)
-		{
-			printf("%ld %d died\n", time, philo->ind + 1);
 			philo->share->all_alive = ANY_DEAD;
-		}
-		else if (msg == THINK)
-			printf("%ld %d is thinking\n", time, philo->ind + 1);
-		else if (msg == FORK)
-			printf("%ld %d has taken a fork\n", time, philo->ind + 1);
-		else if (msg == EAT)
-			printf("%ld %d is eating\n", time, philo->ind + 1);
-		else if (msg == SLEEP)
-			printf("%ld %d is sleeping\n", time, philo->ind + 1);
 	}
 	if (philo->share->all_alive != ALL_ALIVE)
 	{
