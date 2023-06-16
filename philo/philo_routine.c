@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 14:34:38 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/16 18:15:15 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,9 @@ void	routine_init(t_philo *philo, \
 	actions[THINKING] = &philo_think;
 	gettimeofday(&(philo->t_last_eat), NULL);
 	philo->t_last_sleep = philo->t_last_eat;
+	pthread_mutex_lock(&philo->pub_t_last_eat_lock);
+	philo->pub_t_last_eat = philo->t_last_eat;
+	pthread_mutex_unlock(&philo->pub_t_last_eat_lock);
 	if (philo->ind % 2 == 0)
 		usleep(philo_max(T_OFFSET, philo->share->n_philo * 5));
 }
@@ -74,6 +77,9 @@ int	philo_eat(t_philo *philo, t_timeval time)
 	if (philo->status == TO_EAT)
 	{
 		philo->t_last_eat = time;
+		pthread_mutex_lock(&philo->pub_t_last_eat_lock);
+		philo->pub_t_last_eat = time;
+		pthread_mutex_unlock(&philo->pub_t_last_eat_lock);
 		philo->status = EATING;
 		return (EAT);
 	}

@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 15:28:34 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/16 16:37:06 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,10 @@ typedef enum e_alive
 
 typedef enum e_all_alive
 {
-	ALL_DONE_EAT = -1,
+	ALL_ALIVE = 0,
+	ANY_TO_DIE,
 	ANY_DEAD,
-	ALL_ALIVE,
+	ALL_DONE_EAT,
 }	t_all_alive;
 
 typedef enum e_msg
@@ -93,14 +94,18 @@ typedef struct s_philo
 	t_alive		pub_alive;
 	t_mutex		pub_alive_lock;
 	t_timeval	t_last_eat;
+	t_timeval	pub_t_last_eat;
+	t_mutex		pub_t_last_eat_lock;
 	t_timeval	t_last_sleep;
 }				t_philo;
 
 typedef struct s_monitor_env
 {
-	t_alive	pub_alive;
-	int		i;
-	int		check;
+	t_alive		pub_alive;
+	int			i;
+	int			check;
+	t_timeval	time;
+	t_timeval	t_last_eat;
 }			t_monitor_env;
 
 t_share	*check_init_args(int argc, char **argv);
@@ -125,7 +130,7 @@ int		refresh_unit_time(t_philo *philo, t_timeval time);
 void	philo_printf(long time, t_msg msg, t_philo *philo);
 
 void	*monitoring_routine(void *arg);
-void	check_all_done(int check, t_philo *philos);
+void	check_all_done(t_monitor_env env, t_philo *philos);
 
 int		philo_atoi(const char *str);
 int		perror_n_return(int exit_status);

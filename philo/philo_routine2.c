@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 15:44:08 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/16 18:03:25 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,8 @@ int	refresh_unit_time(t_philo *philo, t_timeval time)
 			- get_utime_diff(time, philo->t_last_sleep);
 	t_left_die = philo->share->t_die - get_utime_diff(time, philo->t_last_eat);
 	t_left_min = (philo_min(t_left_state, t_left_die) * 3) / 4;
+	if (philo->status == EATING)
+		t_left_min = philo_min(t_left_min, 7000);
 	if (T_UNIT < t_left_min)
 		return ((int) t_left_min);
 	else
@@ -92,6 +94,16 @@ int	refresh_unit_time(t_philo *philo, t_timeval time)
 void	philo_printf(long time, t_msg msg, t_philo *philo)
 {
 	pthread_mutex_lock(&philo->share->all_alive_lock);
+	if (philo->share->all_alive == ANY_TO_DIE)
+	{
+		// printf("%d, any to killed\n", philo->ind + 1);
+		if (philo->n_forks > 0)
+			put_back_forks(philo);
+		philo->alive = DEAD;
+		pthread_mutex_unlock(&philo->share->all_alive_lock);
+		philo->msg = NONE;
+		return ;
+	}
 	if (philo->share->all_alive != ANY_DEAD)
 	{
 		philo_print(time, philo->ind + 1, msg);
