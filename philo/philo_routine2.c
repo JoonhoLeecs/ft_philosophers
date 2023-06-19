@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/19 09:24:35 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 11:07:52 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ int	take_forks(t_philo *philo, t_timeval time)
 
 void	put_back_forks(t_philo *philo)
 {
+	if (philo->n_forks == 0)
+		return ;
 	if (philo->n_forks == 2)
 	{
 		*(philo->share->forks + philo->first_fork) = 0;

@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/19 09:12:50 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 11:11:37 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,10 +76,10 @@ int	check_starvation(t_philo *philo, t_timeval time)
 
 int	philo_to_eat(t_philo *philo, t_timeval time)
 {
-	philo->t_last_eat = time;
 	pthread_mutex_lock(&philo->pub_t_last_eat_lock);
 	philo->pub_t_last_eat = time;
 	pthread_mutex_unlock(&philo->pub_t_last_eat_lock);
+	philo->t_last_eat = time;
 	philo->status = EATING;
 	return (EAT);
 }

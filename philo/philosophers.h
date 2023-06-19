@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/19 09:08:27 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 13:56:30 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,8 @@ int		refresh_unit_time(t_philo *philo, t_timeval time);
 void	philo_printf(long time, t_msg msg, t_philo *philo);
 
 void	*monitoring_routine(void *arg);
-void	check_pub_values(t_philo *philos, t_monitor_env *env);
+// void	check_pub_values(t_philo *philos, t_monitor_env *env);
+void	check_pub_values(t_philo *philos, t_monitor_env *env, int *unit_time);
 void	check_all_done(t_monitor_env env, t_philo *philos);
 
 int		philo_atoi(const char *str);
