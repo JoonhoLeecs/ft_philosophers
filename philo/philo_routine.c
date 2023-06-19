@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/19 19:58:24 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 21:19:29 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ void	*philo_routine(void *arg)
 			break ;
 		unit_time = refresh_unit_time(philo, time);
 		philo->msg = philo_actions[(int)philo->status](philo, time);
-		if (philo->status == THINKING && philo->msg == NONE)
+		// if (philo->status == THINKING && philo->msg == NONE)
 			// unit_time = T_OFFSET * 4;
-			unit_time = refresh_unit_time2(philo, time);
+			// unit_time = refresh_unit_time2(philo, time);
 		if (philo->msg != NONE)
 		{
 			if (philo->msg != SKIP)
@@ -59,9 +59,9 @@ void	routine_init(t_philo *philo, \
 	philo->t_last_sleep = philo->t_last_eat;
 		// usleep(philo_max(T_OFFSET, philo->share->n_philo * 5));
 	if (philo->ind % 2 == 0)
-		usleep(philo_max(T_OFFSET, philo->share->n_philo * 4) + 4 * philo->ind);
+		usleep(philo_max(T_OFFSET, 5 * philo->share->n_philo) + 5 * philo->ind);
 	else
-		usleep(4 * philo->ind);
+		usleep(5 * philo->ind);
 }
 
 int	check_starvation(t_philo *philo, t_timeval time)
