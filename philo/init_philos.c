@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:27:56 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/19 08:17:36 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 18:56:15 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,6 @@ t_philo	*init_philos(t_share *share)
 	{
 		init_philo_var(philos, i, share);
 		check = pthread_mutex_init(&(philos[i].pub_alive_lock), NULL);
-		if (check == 0)
-			check = pthread_mutex_init(&(philos[i].pub_t_last_eat_lock), NULL);
 		i++;
 	}
 	if (check != 0)
@@ -61,10 +59,7 @@ void	init_philo_var(t_philo *philos, int i, t_share *share)
 t_philo	*abort_init_philos(t_philo *philos, int i)
 {
 	while (--i > -1)
-	{
 		pthread_mutex_destroy(&(philos[i].pub_alive_lock));
-		pthread_mutex_destroy(&(philos[i].pub_t_last_eat_lock));
-	}
 	free(philos);
 	return (NULL);
 }
