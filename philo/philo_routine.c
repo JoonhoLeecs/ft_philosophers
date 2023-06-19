@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/16 18:15:15 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 09:12:50 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,15 @@ void	*philo_routine(void *arg)
 void	routine_init(t_philo *philo, \
 		int (*actions[])(t_philo *, t_timeval time))
 {
-	actions[TO_EAT] = &philo_eat;
+	actions[TO_EAT] = &philo_to_eat;
 	actions[TO_SLEEP] = &philo_sleep;
 	actions[TO_THINK] = &philo_think;
-	actions[EATING] = &philo_eat;
+	actions[EATING] = &philo_eating;
 	actions[SLEEPING] = &philo_sleep;
 	actions[THINKING] = &philo_think;
-	gettimeofday(&(philo->t_last_eat), NULL);
+	pthread_mutex_lock(&philo->share->all_alive_lock);
+	philo->t_last_eat = philo->share->t_start;
+	pthread_mutex_unlock(&philo->share->all_alive_lock);
 	philo->t_last_sleep = philo->t_last_eat;
 	pthread_mutex_lock(&philo->pub_t_last_eat_lock);
 	philo->pub_t_last_eat = philo->t_last_eat;
@@ -72,18 +74,19 @@ int	check_starvation(t_philo *philo, t_timeval time)
 	return (philo->alive);
 }
 
-int	philo_eat(t_philo *philo, t_timeval time)
+int	philo_to_eat(t_philo *philo, t_timeval time)
 {
-	if (philo->status == TO_EAT)
-	{
-		philo->t_last_eat = time;
-		pthread_mutex_lock(&philo->pub_t_last_eat_lock);
-		philo->pub_t_last_eat = time;
-		pthread_mutex_unlock(&philo->pub_t_last_eat_lock);
-		philo->status = EATING;
-		return (EAT);
-	}
-	else if (get_utime_diff(time, philo->t_last_eat) > philo->share->t_eat)
+	philo->t_last_eat = time;
+	pthread_mutex_lock(&philo->pub_t_last_eat_lock);
+	philo->pub_t_last_eat = time;
+	pthread_mutex_unlock(&philo->pub_t_last_eat_lock);
+	philo->status = EATING;
+	return (EAT);
+}
+
+int	philo_eating(t_philo *philo, t_timeval time)
+{
+	if (get_utime_diff(time, philo->t_last_eat) > philo->share->t_eat)
 	{
 		if (philo->n_forks > 0)
 			put_back_forks(philo);
@@ -97,23 +100,6 @@ int	philo_eat(t_philo *philo, t_timeval time)
 			pthread_mutex_unlock(&philo->pub_alive_lock);
 		}
 		philo->status = TO_SLEEP;
-		return (SKIP);
-	}
-	return (NONE);
-}
-
-int	philo_sleep(t_philo *philo, t_timeval time)
-{
-	if (philo->status == TO_SLEEP)
-	{
-		philo->t_last_sleep = time;
-		philo->status = SLEEPING;
-		return (SLEEP);
-	}
-	else if (get_utime_diff(time, philo->t_last_sleep)
-		> philo->share->t_sleep)
-	{
-		philo->status = TO_THINK;
 		return (SKIP);
 	}
 	return (NONE);

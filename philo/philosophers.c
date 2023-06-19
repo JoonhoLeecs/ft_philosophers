@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/16 16:54:09 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 09:33:15 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,15 @@ int	main(int argc, char **argv)
 		return (perror_n_return(EXIT_FAILURE));
 	philos = init_philos(share);
 	if (philos == NULL)
-	{
-		clear_share(share);
-		return (perror_n_return(EXIT_FAILURE));
-	}
+		return (clear_share_perror_return(share, EXIT_FAILURE));
 	i = rev_iterator(thread_create(share, philos, &check), share->n_philo);
+	if (check == 0)
+		check += pthread_join(share->monitoring, NULL);
 	while (i > -1)
 	{
 		check += pthread_join((philos + i)->thread, NULL);
 		i = rev_iterator(i, share->n_philo);
 	}
-	// if (share->n_eat > -1)
-		check += pthread_join(share->monitoring, NULL);
 	clear_all(share, philos);
 	return (check);
 }
@@ -46,7 +43,7 @@ int	thread_create(t_share *share, t_philo *philos, int *check)
 	int	j;
 
 	*check = 0;
-	gettimeofday(&(share->t_start), NULL);
+	pthread_mutex_lock(&share->all_alive_lock);
 	i = (share->n_philo > 1) * 1;
 	while (i < share->n_philo)
 	{
@@ -59,13 +56,13 @@ int	thread_create(t_share *share, t_philo *philos, int *check)
 	if (*check == 0)
 		j = pthread_create(&share->monitoring, NULL,
 				monitoring_routine, philos);
+	gettimeofday(&(share->t_start), NULL);
 	if (*check != 0 || j != 0)
 	{
-		pthread_mutex_lock(&philos->share->all_alive_lock);
 		philos->share->all_alive = ALL_DONE_EAT;
-		pthread_mutex_unlock(&philos->share->all_alive_lock);
 		*check += j;
 	}
+	pthread_mutex_unlock(&share->all_alive_lock);
 	return (i);
 }
 

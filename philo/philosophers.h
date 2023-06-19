@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/16 16:37:06 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 09:08:27 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ int		save_args(t_share *share, int *n, int i);
 int		init_share_mutex(t_share *share);
 t_philo	*init_philos(t_share *share);
 void	init_philo_var(t_philo *philos, int i, t_share *share);
+t_philo	*abort_init_philos(t_philo *philos, int i);
 int		thread_create(t_share *share, t_philo *philos, int *check);
 int		odd_even_iterator(int i, int n_philo);
 int		rev_iterator(int i, int n_philo);
@@ -121,7 +122,8 @@ void	*philo_routine(void *arg);
 void	routine_init(t_philo *philo, \
 		int (*actions[])(t_philo *, t_timeval time));
 int		check_starvation(t_philo *philo, t_timeval time);
-int		philo_eat(t_philo *philo, t_timeval time);
+int		philo_to_eat(t_philo *philo, t_timeval time);
+int		philo_eating(t_philo *philo, t_timeval time);
 int		philo_sleep(t_philo *philo, t_timeval time);
 int		philo_think(t_philo *philo, t_timeval time);
 int		take_forks(t_philo *philo, t_timeval time);
@@ -130,6 +132,7 @@ int		refresh_unit_time(t_philo *philo, t_timeval time);
 void	philo_printf(long time, t_msg msg, t_philo *philo);
 
 void	*monitoring_routine(void *arg);
+void	check_pub_values(t_philo *philos, t_monitor_env *env);
 void	check_all_done(t_monitor_env env, t_philo *philos);
 
 int		philo_atoi(const char *str);
@@ -145,5 +148,6 @@ void	philo_print(long time, int id, t_msg msg);
 
 void	clear_all(t_share *share, t_philo *philos);
 void	clear_share(t_share *share);
+int		clear_share_perror_return(t_share *share, int exit_status);
 
 #endif

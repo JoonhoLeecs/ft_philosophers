@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 10:08:22 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/16 18:15:41 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 09:40:29 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@ void	*monitoring_routine(void *arg)
 	t_monitor_env	env;
 
 	philos = (t_philo *)arg;
+	pthread_mutex_lock(&philos->share->all_alive_lock);
+	env.t_last_eat = philos->share->t_start;
+	pthread_mutex_unlock(&philos->share->all_alive_lock);
 	usleep(philo_max(T_OFFSET, philos->share->n_philo * 5));
 	env.check = 0;
 	while (env.check < philos->share->n_philo)
@@ -27,25 +30,31 @@ void	*monitoring_routine(void *arg)
 		while (env.i < philos->share->n_philo
 			&& env.check < philos->share->n_philo)
 		{
-			pthread_mutex_lock(&(philos[env.i].pub_alive_lock));
-			env.pub_alive = philos[env.i].pub_alive;
-			pthread_mutex_unlock(&(philos[env.i].pub_alive_lock));
-			pthread_mutex_lock(&(philos[env.i].pub_t_last_eat_lock));
-			env.t_last_eat = philos[env.i].pub_t_last_eat;
-			pthread_mutex_unlock(&(philos[env.i].pub_t_last_eat_lock));
-			gettimeofday(&(env.time), NULL);
-			if (get_utime_diff(env.time, env.t_last_eat) > philos->share->t_die)
-				env.check = philos->share->n_philo + 1;
-			else if (env.pub_alive == DEAD)
-				env.check = philos->share->n_philo + 2;
-			else if (env.pub_alive == DONE_EAT)
-				env.check++;
+			check_pub_values(philos, &env);
 			env.i++;
 		}
-		usleep(2 * T_OFFSET);
+		usleep(5 * T_OFFSET);
 	}
 	check_all_done(env, philos);
 	return (NULL);
+}
+
+void	check_pub_values(t_philo *philos, t_monitor_env *env)
+{
+	pthread_mutex_lock(&(philos[env->i].pub_alive_lock));
+	env->pub_alive = philos[env->i].pub_alive;
+	pthread_mutex_unlock(&(philos[env->i].pub_alive_lock));
+	pthread_mutex_lock(&(philos[env->i].pub_t_last_eat_lock));
+	if (philos[env->i].pub_t_last_eat.tv_sec != 0)
+		env->t_last_eat = philos[env->i].pub_t_last_eat;
+	pthread_mutex_unlock(&(philos[env->i].pub_t_last_eat_lock));
+	gettimeofday(&(env->time), NULL);
+	if (get_utime_diff(env->time, env->t_last_eat) > philos->share->t_die)
+		env->check = philos->share->n_philo + 1;
+	else if (env->pub_alive == DEAD)
+		env->check = philos->share->n_philo + 2;
+	else if (env->pub_alive == DONE_EAT)
+		env->check++;
 }
 
 void	check_all_done(t_monitor_env env, t_philo *philos)

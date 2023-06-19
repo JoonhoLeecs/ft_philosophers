@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:58:21 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 13:18:27 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 09:08:34 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,4 +53,10 @@ void	clear_share(t_share *share)
 	free(share->fork_locks);
 	pthread_mutex_destroy(&share->all_alive_lock);
 	free(share);
+}
+
+int	clear_share_perror_return(t_share *share, int exit_status)
+{
+	clear_share(share);
+	return (perror_n_return(exit_status));
 }

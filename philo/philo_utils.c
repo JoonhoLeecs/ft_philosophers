@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:58:21 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 13:18:18 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/19 08:38:40 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	philo_atoi(const char *str)
 
 int	perror_n_return(int exit_status)
 {
-	write(STDERR_FILENO, "Error: invalid arguement\n", 26);
+	printf("Error: invalid arguement\n");
 	return (exit_status);
 }
 
