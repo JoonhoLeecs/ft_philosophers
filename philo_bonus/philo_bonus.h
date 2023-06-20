@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 15:45:48 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/20 21:12:14 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,12 +95,12 @@ typedef struct s_philo
 	t_status	status;
 	t_msg		msg;
 	t_alive		alive;
-	t_timeval	t_last_eat;
 	t_timeval	t_last_sleep;
-	t_pthread	forks_check;
-	t_mutex		two_forks_lock;
-	int			have_two_forks;
-	int			done_check_forks;
+	t_timeval	t_last_eat;
+	t_timeval	pub_t_last_eat;
+	char		*last_eat_sem_name;
+	t_sem		*last_eat_sem;
+	t_pthread	starving_monitor;
 }				t_philo;
 
 t_share	*check_init_args(int argc, char **argv);
@@ -108,6 +108,9 @@ int		save_args(t_share *share, int *n, int i);
 int		init_sems(t_share *share);
 int		init_fulls_sem(t_share *share);
 t_philo	*init_philos(t_share *share);
+int		init_philo_sems(t_philo *philos, int ind);
+char	*get_last_eat_sem_name(int i);
+int		put_names(char *str, int ind);
 int		fork_child_philos(t_share *share, t_philo *philos);
 int		odd_even_iterator(int i, int n_philo);
 int		rev_iterator(int i, int n_philo);
@@ -115,7 +118,7 @@ int		rev_iterator(int i, int n_philo);
 int		philo_routine(t_philo *philo);
 void	routine_init(t_philo *philo,
 			int (*actions[])(t_philo *, t_timeval time));
-void	*check_forks(void *arg);
+void	*starving_monitor(void *arg);
 int		check_starvation(t_philo *philo, t_timeval time);
 int		philo_eat(t_philo *philo, t_timeval time);
 int		philo_sleep(t_philo *philo, t_timeval time);
@@ -141,5 +144,6 @@ void	philo_print(long time, int id, t_msg msg);
 
 void	clear_all(t_share *share, t_philo *philos);
 void	clear_share(t_share *share);
+int		kill_n_clear_all(t_share *share, t_philo *philos);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:58:21 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 13:48:48 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/20 17:25:29 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,16 @@ long	philo_min(long a, long b)
 
 void	clear_all(t_share *share, t_philo *philos)
 {
+	int	i;
+
+	i = 0;
+	while (i < share->n_philo)
+	{
+		sem_close((philos + i)->last_eat_sem);
+		sem_unlink((philos + i)->last_eat_sem_name);
+		free((philos + i)->last_eat_sem_name);
+		i++;
+	}
 	free(philos);
 	clear_share(share);
 }

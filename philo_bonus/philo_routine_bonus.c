@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 13:46:27 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/20 21:05:58 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ int	philo_routine(t_philo *philo)
 		}
 		usleep(unit_time);
 	}
+	pthread_join(philo->starving_monitor, NULL);
 	exit (3 - philo->alive);
 }
 
@@ -48,45 +49,38 @@ void	routine_init(t_philo *philo,
 	actions[EATING] = &philo_eat;
 	actions[SLEEPING] = &philo_sleep;
 	actions[THINKING] = &philo_think;
-	gettimeofday(&(philo->t_last_eat), NULL);
+	philo->t_last_eat = philo->share->t_start;
 	philo->t_last_sleep = philo->t_last_eat;
+	if (pthread_create(&philo->starving_monitor, NULL,
+			starving_monitor, philo) != 0)
+		exit (EXIT_FAILURE);
+	sem_wait(philo->last_eat_sem);
+	philo->pub_t_last_eat = philo->t_last_eat;
+	sem_post(philo->last_eat_sem);
 	if (philo->ind % 2 == 0)
 		usleep(philo_max(T_OFFSET, philo->share->n_philo * 5));
-	if (philo->ind == 0)
-	{
-		philo->have_two_forks = 0;
-		philo->done_check_forks = 0;
-		if (pthread_mutex_init(&philo->two_forks_lock, NULL) != 0)
-			exit (EXIT_FAILURE);
-		if (pthread_create(&philo->forks_check, NULL, check_forks, philo) != 0)
-			exit (EXIT_FAILURE);
-	}
 }
 
-void	*check_forks(void *arg)
+void	*starving_monitor(void *arg)
 {
 	t_philo		*philo;
-	int			check;
 	t_timeval	time;
+	t_timeval	pub_t_last_eat;
 
 	philo = (t_philo *)arg;
-	usleep(philo->share->t_eat / 2);
-	pthread_mutex_lock(&philo->two_forks_lock);
-	check = philo->have_two_forks;
-	pthread_mutex_unlock(&philo->two_forks_lock);
-	if (check == 1)
+	while (1)
 	{
+		sem_wait(philo->last_eat_sem);
+		pub_t_last_eat = philo->pub_t_last_eat;
+		sem_post(philo->last_eat_sem);
 		gettimeofday(&time, NULL);
-		usleep(philo->share->t_die - get_utime_diff(time, philo->t_last_eat));
-		gettimeofday(&time, NULL);
-		if (get_utime_diff(time, philo->t_last_eat) > philo->share->t_die)
+		if (get_utime_diff(time, pub_t_last_eat) > philo->share->t_die)
 		{
-			printf("%ld %d died\n", get_mtime_diff(time, philo->share->t_start),
-				philo->ind + 1);
-			kill (philo->pid, SIGINT);
+			sem_post(philo->share->forks_sem);
+			return (NULL);
 		}
+		usleep(5 * T_OFFSET);
 	}
-	return (NULL);
 }
 
 int	check_starvation(t_philo *philo, t_timeval time)
@@ -111,6 +105,9 @@ int	philo_eat(t_philo *philo, t_timeval time)
 	if (philo->status == TO_EAT)
 	{
 		philo->t_last_eat = time;
+		sem_wait(philo->last_eat_sem);
+		philo->pub_t_last_eat = time;
+		sem_post(philo->last_eat_sem);
 		philo->status = EATING;
 		return (EAT);
 	}

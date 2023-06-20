@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 14:36:59 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/20 21:06:44 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ int	philo_sleep(t_philo *philo, t_timeval time)
 	else if (get_utime_diff(time, philo->t_last_sleep)
 		> philo->share->t_sleep)
 	{
-		usleep(2 * T_OFFSET);
 		philo->status = TO_THINK;
 		return (SKIP);
 	}
@@ -34,6 +33,7 @@ int	philo_think(t_philo *philo, t_timeval time)
 {
 	if (philo->status == TO_THINK)
 	{
+		usleep(2 * T_OFFSET);
 		philo->status = THINKING;
 		return (THINK);
 	}
@@ -53,13 +53,6 @@ int	take_forks(t_philo *philo, t_timeval time)
 		return (NONE);
 	philo_printf(get_mtime_diff(time, philo->share->t_start),
 		FORK, philo);
-	if (philo->ind == 0 && philo->done_check_forks < 6)
-	{
-		pthread_mutex_lock(&philo->two_forks_lock);
-		philo->have_two_forks += philo->n_forks;
-		pthread_mutex_unlock(&philo->two_forks_lock);
-		philo->done_check_forks += philo->n_forks;
-	}
 	if (philo->n_forks == 2)
 		philo->status = TO_EAT;
 	return (SKIP);
@@ -67,11 +60,6 @@ int	take_forks(t_philo *philo, t_timeval time)
 
 void	put_back_forks(t_philo *philo)
 {
-	if (philo->ind == 0 && philo->done_check_forks > 5)
-	{
-		pthread_mutex_destroy(&philo->two_forks_lock);
-		pthread_join(philo->forks_check, NULL);
-	}
 	if (philo->n_forks == 2)
 	{
 		sem_post(philo->share->forks_sem);
@@ -93,7 +81,7 @@ int	refresh_unit_time(t_philo *philo, t_timeval time)
 	long		t_left_die;
 
 	if (philo->status == TO_EAT || philo->status == TO_SLEEP)
-		return (T_UNIT / 2);
+		return (T_UNIT);
 	if (philo->status == EATING)
 		t_left_state = philo->share->t_eat
 			- get_utime_diff(time, philo->t_last_eat);

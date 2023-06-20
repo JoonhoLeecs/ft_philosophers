@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:27:56 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 13:56:26 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/20 21:12:47 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,66 @@ t_philo	*init_philos(t_share *share)
 		philos[i].n_forks = 0;
 		philos[i].status = THINKING;
 		philos[i].alive = ALIVE;
+		if (init_philo_sems(philos, i) != 0)
+			return (NULL);
 		i++;
 	}
 	return (philos);
+}
+
+int	init_philo_sems(t_philo *philos, int ind)
+{
+	philos[ind].last_eat_sem_name = get_last_eat_sem_name(ind);
+	sem_unlink(philos[ind].last_eat_sem_name);
+	philos[ind].last_eat_sem = sem_open(philos[ind].last_eat_sem_name, O_CREAT,
+			0644, 1);
+	if (philos[ind].last_eat_sem == SEM_FAILED)
+	{
+		free(philos[ind].last_eat_sem_name);
+		while (--ind > -1)
+		{
+			sem_close(philos[ind].last_eat_sem);
+			sem_unlink(philos[ind].last_eat_sem_name);
+			free(philos[ind].last_eat_sem_name);
+		}
+		free(philos);
+		return (1);
+	}
+	return (0);
+}
+
+char	*get_last_eat_sem_name(int i)
+{
+	int		len;
+	int		ind;
+	char	*result;
+
+	len = get_n_digit(i) + 1 + 14;
+	result = (char *)malloc(len * sizeof (char));
+	if (result == NULL)
+		exit (EXIT_FAILURE);
+	memset(result, 0, len);
+	ind = put_names(result, 0);
+	philo_put_nbr((result + ind), i, len - 15);
+	ind = put_names((result + ind + len - 15 + 1), 1);
+	return (result);
+}
+
+int	put_names(char *str, int ind)
+{
+	char	*rest;
+	int		j;
+
+	if (ind == 0)
+		rest = "/last_eat";
+	else
+		rest = ".sem";
+	j = 0;
+	while (rest[j])
+	{
+		*(str + j) = rest[j];
+		j++;
+	}
+	*(str + j) = '\0';
+	return (j);
 }

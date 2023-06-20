@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 10:08:22 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/15 13:40:05 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/20 21:09:32 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,7 @@ int	parent(t_share *share, t_philo *philos, int ind)
 	int		pid;
 
 	if (ind < share->n_philo)
-	{
-		kill(0, SIGINT);
-		clear_all(share, philos);
-		return (EXIT_FAILURE);
-	}
+		kill_n_clear_all(share, philos);
 	usleep(philo_max(T_OFFSET, philos->share->n_philo * 5) + T_OFFSET);
 	if (share->n_eat > -1)
 		init_monitor(share, philos);
@@ -37,6 +33,7 @@ int	parent(t_share *share, t_philo *philos, int ind)
 		i++;
 	}
 	kill(0, SIGINT);
+	sem_post(share->print_sem);
 	clear_all(share, philos);
 	return (EXIT_SUCCESS);
 }
@@ -67,4 +64,11 @@ void	init_monitor(t_share *share, t_philo *philos)
 	}
 	else
 		return ;
+}
+
+int	kill_n_clear_all(t_share *share, t_philo *philos)
+{
+	kill(0, SIGINT);
+	clear_all(share, philos);
+	return (EXIT_FAILURE);
 }
