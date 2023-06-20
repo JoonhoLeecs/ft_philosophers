@@ -1,9 +1,7 @@
 NAME = philo
 
 CC = cc
-# CFLAGS = -Werror -Wall -Wextra -fsanitize=thread -g
 CFLAGS = -Werror -Wall -Wextra
-LDFLAGS = -pthread
 
 MAKE = make
 MFLAGS = -C
@@ -31,10 +29,10 @@ MANDATORY_OBJS = $(MANDATORY_SRCS:.c=.o)
 all : $(NAME)
 
 $(NAME) : $(MANDATORY_OBJS) $(HEADER)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MANDATORY_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(MANDATORY_OBJS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean :
 	$(RM) $(RMFLAGS) $(MANDATORY_OBJS)

@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/19 19:03:29 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/20 14:49:53 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ typedef enum e_alive
 typedef enum e_all_alive
 {
 	ALL_ALIVE = 0,
-	// ANY_TO_DIE,
 	ANY_DEAD,
 	ALL_DONE_EAT,
 }	t_all_alive;
@@ -94,8 +93,6 @@ typedef struct s_philo
 	t_alive		pub_alive;
 	t_mutex		pub_alive_lock;
 	t_timeval	t_last_eat;
-	// t_timeval	pub_t_last_eat;
-	// t_mutex		pub_t_last_eat_lock;
 	t_timeval	t_last_sleep;
 }				t_philo;
 
@@ -104,7 +101,6 @@ typedef struct s_monitor_env
 	t_alive		pub_alive;
 	int			i;
 	int			check;
-	// t_timeval	time;
 	t_timeval	t_last_eat;
 }			t_monitor_env;
 
@@ -122,19 +118,18 @@ void	*philo_routine(void *arg);
 void	routine_init(t_philo *philo, \
 		int (*actions[])(t_philo *, t_timeval time));
 int		check_starvation(t_philo *philo, t_timeval time);
-int		philo_to_eat(t_philo *philo, t_timeval time);
-int		philo_eating(t_philo *philo, t_timeval time);
+int		philo_eat(t_philo *philo, t_timeval time);
 int		philo_sleep(t_philo *philo, t_timeval time);
 int		philo_think(t_philo *philo, t_timeval time);
 int		take_forks(t_philo *philo, t_timeval time);
+int		only_philo_take_forks(t_philo *philo, t_timeval time);
+void	check_n_grab_forks(t_philo *philo);
 void	put_back_forks(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
 int		refresh_unit_time2(t_philo *philo, t_timeval time);
 void	philo_printf(long time, t_msg msg, t_philo *philo);
 
 void	*monitoring_routine(void *arg);
-// void	check_pub_values(t_philo *philos, t_monitor_env *env);
-// void	check_pub_values(t_philo *philos, t_monitor_env *env, int *unit_time);
 void	init_monitoring(t_monitor_env *env, t_philo *philos);
 void	check_all_done(t_monitor_env env, t_philo *philos);
 

@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 10:08:22 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/19 21:20:04 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/20 14:34:36 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ void	init_monitoring(t_monitor_env *env, t_philo *philos)
 	pthread_mutex_unlock(&philos->share->all_alive_lock);
 	usleep(philo_max(T_OFFSET, 10 * philos->share->n_philo));
 	env->check = 0;
-
 }
 
 void	check_all_done(t_monitor_env env, t_philo *philos)
