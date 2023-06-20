@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/20 21:05:58 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/21 08:03:11 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,14 +51,14 @@ void	routine_init(t_philo *philo,
 	actions[THINKING] = &philo_think;
 	philo->t_last_eat = philo->share->t_start;
 	philo->t_last_sleep = philo->t_last_eat;
-	if (pthread_create(&philo->starving_monitor, NULL,
-			starving_monitor, philo) != 0)
-		exit (EXIT_FAILURE);
 	sem_wait(philo->last_eat_sem);
 	philo->pub_t_last_eat = philo->t_last_eat;
 	sem_post(philo->last_eat_sem);
 	if (philo->ind % 2 == 0)
 		usleep(philo_max(T_OFFSET, philo->share->n_philo * 5));
+	if (pthread_create(&philo->starving_monitor, NULL,
+			starving_monitor, philo) != 0)
+		exit (EXIT_FAILURE);
 }
 
 void	*starving_monitor(void *arg)
@@ -93,7 +93,7 @@ int	check_starvation(t_philo *philo, t_timeval time)
 			put_back_forks(philo);
 		philo->alive = DEAD;
 		sem_close(philo->share->forks_sem);
-		sem_close(philo->share->print_sem);
+		sem_close(philo->last_eat_sem);
 		if (philo->share->n_eat > -1)
 			sem_close(philo->share->fulls_sem);
 	}

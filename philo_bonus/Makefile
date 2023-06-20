@@ -15,6 +15,7 @@ philo_bonus.h
 
 BONUS_SRCS = \
 check_init_args_bonus.c \
+init_philos_bonus.c \
 philo_utils_bonus.c \
 philo_utils2_bonus.c \
 philo_bonus.c \
