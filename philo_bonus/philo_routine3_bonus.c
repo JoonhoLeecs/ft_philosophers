@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/21 08:42:45 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/21 16:11:19 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	philo_printf(t_msg msg, t_philo *philo)
 
 	sem_wait(philo->share->print_sem);
 	gettimeofday(&print_time, NULL);
-	philo_print(get_mtime_diff(print_time, philo->share->t_start),
+	philo_print(get_utime_diff(print_time, philo->share->t_start) / 1000,
 		philo->ind + 1, msg);
 	if (msg == EAT)
 	{

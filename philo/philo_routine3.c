@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/21 08:42:32 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/21 16:44:34 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,15 +45,16 @@ int	refresh_unit_time2(t_philo *philo, t_timeval time)
 	if (t_left_die / philo->share->t_eat > 0)
 	{
 		if (philo->n_eat > 0)
-			t_left_min = 11 * T_OFFSET + philo_max(philo->share->t_eat
+			t_left_min = 5 * T_OFFSET * (t_left_die / philo->share->t_eat)
+				+ philo_max(philo->share->t_eat
 					- get_utime_diff(time, philo->t_last_sleep), 0);
 		else
-			t_left_min = 11 * T_OFFSET;
+			t_left_min = 5 * T_OFFSET;
 	}
 	else if (t_left_die * 10 < philo->share->t_eat)
 		t_left_min = 2 * T_UNIT;
 	else
-		t_left_min = 3 * T_OFFSET;
+		t_left_min = 2 * T_OFFSET;
 	return (t_left_min);
 }
 
@@ -65,7 +66,7 @@ void	philo_printf(t_msg msg, t_philo *philo)
 	if (philo->share->all_alive != ANY_DEAD)
 	{
 		gettimeofday(&print_time, NULL);
-		philo_print(get_mtime_diff(print_time, philo->share->t_start),
+		philo_print(get_utime_diff(print_time, philo->share->t_start) / 1000,
 			philo->ind + 1, msg);
 		if (msg == DIE)
 			philo->share->all_alive = ANY_DEAD;
