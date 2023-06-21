@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/20 21:06:44 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/21 08:44:45 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,7 @@ int	take_forks(t_philo *philo, t_timeval time)
 	philo->n_forks += 1;
 	if (check_starvation(philo, time) == DEAD)
 		return (NONE);
-	philo_printf(get_mtime_diff(time, philo->share->t_start),
-		FORK, philo);
+	philo_printf(FORK, philo);
 	if (philo->n_forks == 2)
 		philo->status = TO_EAT;
 	return (SKIP);

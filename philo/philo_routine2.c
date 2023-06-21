@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/20 14:48:59 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/21 08:43:57 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,8 @@ int	take_forks(t_philo *philo, t_timeval time)
 			break ;
 		usleep(refresh_unit_time2(philo, time));
 	}
-	philo_printf(get_mtime_diff(time, philo->share->t_start),
-		FORK, philo);
-	philo_printf(get_mtime_diff(time, philo->share->t_start),
-		FORK, philo);
+	philo_printf(FORK, philo);
+	philo_printf(FORK, philo);
 	philo->status = TO_EAT;
 	return (SKIP);
 }
@@ -60,8 +58,7 @@ int	only_philo_take_forks(t_philo *philo, t_timeval time)
 		gettimeofday(&time, NULL);
 		if (check_starvation(philo, time) == DEAD)
 			return (NONE);
-		philo_printf(get_mtime_diff(time, philo->share->t_start),
-			FORK, philo);
+		philo_printf(FORK, philo);
 		return (SKIP);
 	}
 	else if (philo->first_fork == philo->second_fork && philo->n_forks == 1)

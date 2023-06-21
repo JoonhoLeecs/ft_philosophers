@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/20 14:47:59 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/21 08:42:32 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,14 +57,22 @@ int	refresh_unit_time2(t_philo *philo, t_timeval time)
 	return (t_left_min);
 }
 
-void	philo_printf(long time, t_msg msg, t_philo *philo)
+void	philo_printf(t_msg msg, t_philo *philo)
 {
+	t_timeval	print_time;
+
 	pthread_mutex_lock(&philo->share->all_alive_lock);
 	if (philo->share->all_alive != ANY_DEAD)
 	{
-		philo_print(time, philo->ind + 1, msg);
+		gettimeofday(&print_time, NULL);
+		philo_print(get_mtime_diff(print_time, philo->share->t_start),
+			philo->ind + 1, msg);
 		if (msg == DIE)
 			philo->share->all_alive = ANY_DEAD;
+		else if (msg == EAT)
+			philo->t_last_eat = print_time;
+		else if (msg == SLEEP)
+			philo->t_last_sleep = print_time;
 	}
 	if (philo->share->all_alive != ALL_ALIVE)
 	{

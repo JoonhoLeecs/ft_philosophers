@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/21 08:03:11 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/21 08:52:43 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,7 @@ int	philo_routine(t_philo *philo)
 		if (philo->msg != NONE)
 		{
 			if (philo->msg != SKIP)
-				philo_printf(get_mtime_diff(time, philo->share->t_start),
-					philo->msg, philo);
+				philo_printf(philo->msg, philo);
 			continue ;
 		}
 		usleep(unit_time);
@@ -87,8 +86,7 @@ int	check_starvation(t_philo *philo, t_timeval time)
 {
 	if (get_utime_diff(time, philo->t_last_eat) > philo->share->t_die)
 	{
-		philo_printf(get_mtime_diff(time, philo->share->t_start),
-			DIE, philo);
+		philo_printf(DIE, philo);
 		if (philo->n_forks > 0)
 			put_back_forks(philo);
 		philo->alive = DEAD;

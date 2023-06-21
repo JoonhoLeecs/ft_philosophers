@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/20 21:12:14 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/21 08:42:53 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,7 @@ int		philo_think(t_philo *philo, t_timeval time);
 int		take_forks(t_philo *philo, t_timeval time);
 void	put_back_forks(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
-void	philo_printf(long time, t_msg msg, t_philo *philo);
+void	philo_printf(t_msg msg, t_philo *philo);
 
 int		parent(t_share *share, t_philo *philos, int ind);
 void	init_monitor(t_share *share, t_philo *philos);

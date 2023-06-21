@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/20 14:49:53 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/21 08:42:31 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ void	check_n_grab_forks(t_philo *philo);
 void	put_back_forks(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
 int		refresh_unit_time2(t_philo *philo, t_timeval time);
-void	philo_printf(long time, t_msg msg, t_philo *philo);
+void	philo_printf(t_msg msg, t_philo *philo);
 
 void	*monitoring_routine(void *arg);
 void	init_monitoring(t_monitor_env *env, t_philo *philos);
