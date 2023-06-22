@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/21 09:05:53 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/22 11:09:51 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,9 @@ int	main(int argc, char **argv)
 		return (clear_share_perror_return(share, EXIT_FAILURE));
 	i = rev_iterator(thread_create(share, philos, &check), share->n_philo);
 	if (check == 0)
-		check += pthread_join(share->monitoring, NULL);
+		check += pthread_join(share->monitoring_starve, NULL);
+	if (share->n_eat > -1)
+		check += pthread_join(share->monitoring_full, NULL);
 	while (i > -1)
 	{
 		check += pthread_join((philos + i)->thread, NULL);
@@ -54,8 +56,7 @@ int	thread_create(t_share *share, t_philo *philos, int *check)
 		i = odd_even_iterator(i, share->n_philo);
 	}
 	if (*check == 0)
-		j = pthread_create(&share->monitoring, NULL,
-				monitoring_routine, philos);
+		j = monitoring_create(share, philos);
 	gettimeofday(&(share->t_start), NULL);
 	if (*check != 0 || j != 0)
 	{
@@ -64,6 +65,24 @@ int	thread_create(t_share *share, t_philo *philos, int *check)
 	}
 	pthread_mutex_unlock(&share->all_alive_lock);
 	return (i);
+}
+
+int	monitoring_create(t_share *share, t_philo *philos)
+{
+	int	i;
+
+	i = pthread_create(&share->monitoring_starve, NULL,
+			monitoring_starve_routine, philos);
+	if (i != 0)
+		return (i);
+	if (share->n_eat > -1)
+	{
+		i = pthread_create(&share->monitoring_full, NULL,
+				monitoring_full_routine, philos);
+		if (i != 0)
+			return (i);
+	}
+	return (0);
 }
 
 int	odd_even_iterator(int i, int n_philo)

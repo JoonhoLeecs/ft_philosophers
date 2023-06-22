@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/21 08:44:50 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/22 09:45:39 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,16 @@ void	routine_init(t_philo *philo, \
 	pthread_mutex_lock(&philo->share->all_alive_lock);
 	philo->t_last_eat = philo->share->t_start;
 	pthread_mutex_unlock(&philo->share->all_alive_lock);
+	pthread_mutex_lock(&philo->pub_t_last_eat_lock);
+	philo->pub_t_last_eat = philo->t_last_eat;
+	pthread_mutex_unlock(&philo->pub_t_last_eat_lock);
 	philo->t_last_sleep = philo->t_last_eat;
 	if (philo->ind % 2 == 0)
-		usleep(philo_max(T_OFFSET, 5 * philo->share->n_philo) + 5 * philo->ind);
-	else
-		usleep(5 * philo->ind);
+		usleep(philo_max(T_OFFSET, 5 * philo->share->n_philo));
+	// if (philo->ind % 2 == 0)
+	// 	usleep(philo_max(T_OFFSET, 5 * philo->share->n_philo) + 5 * philo->ind);
+	// else
+	// 	usleep(5 * philo->ind);
 }
 
 int	check_starvation(t_philo *philo, t_timeval time)
@@ -75,6 +80,9 @@ int	philo_eat(t_philo *philo, t_timeval time)
 {
 	if (philo->status == TO_EAT)
 	{
+		pthread_mutex_lock(&philo->pub_t_last_eat_lock);
+		philo->pub_t_last_eat = time;
+		pthread_mutex_unlock(&philo->pub_t_last_eat_lock);
 		philo->t_last_eat = time;
 		philo->status = EATING;
 		return (EAT);
