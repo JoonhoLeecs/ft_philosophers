@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 08:27:56 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/19 08:17:30 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/22 09:30:34 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,19 +74,19 @@ int	init_share_mutex(t_share *share)
 		check = pthread_mutex_init(share->fork_locks + j++, NULL);
 	if (check != 0)
 	{
-		free(share->forks);
-		free(share->fork_locks);
 		while (--j >= 0)
 			pthread_mutex_destroy(share->fork_locks + j);
+		free(share->forks);
+		free(share->fork_locks);
 		return (EXIT_FAILURE);
 	}
 	check = pthread_mutex_init(&share->all_alive_lock, NULL);
 	if (check != 0)
 	{
-		free(share->forks);
-		free(share->fork_locks);
 		while (--j >= 0)
 			pthread_mutex_destroy(share->fork_locks + j);
+		free(share->forks);
+		free(share->fork_locks);
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
