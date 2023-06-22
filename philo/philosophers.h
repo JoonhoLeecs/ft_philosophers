@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:30 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/22 10:50:00 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/22 15:50:17 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ typedef enum e_all_alive
 {
 	ALL_ALIVE = 0,
 	ANY_DEAD,
-	ANY_TO_DIE,
 	ALL_DONE_EAT,
 }	t_all_alive;
 
@@ -116,6 +115,7 @@ t_philo	*init_philos(t_share *share);
 void	init_philo_var(t_philo *philos, int i, t_share *share);
 t_philo	*abort_init_philos(t_philo *philos, int i);
 int		thread_create(t_share *share, t_philo *philos, int *check);
+int		monitoring_create(t_share *share, t_philo *philos);
 int		odd_even_iterator(int i, int n_philo);
 int		rev_iterator(int i, int n_philo);
 
@@ -127,18 +127,16 @@ int		philo_eat(t_philo *philo, t_timeval time);
 int		philo_sleep(t_philo *philo, t_timeval time);
 int		philo_think(t_philo *philo, t_timeval time);
 int		take_forks(t_philo *philo, t_timeval time);
-// int		only_philo_take_forks(t_philo *philo, t_timeval time);
-// void	check_n_grab_forks(t_philo *philo);
 void	put_back_forks(t_philo *philo);
 int		refresh_unit_time(t_philo *philo, t_timeval time);
-// int		refresh_unit_time2(t_philo *philo, t_timeval time);
 void	philo_printf(t_msg msg, t_philo *philo);
+void	update_time(t_msg msg, t_timeval print_time, t_philo *philo);
 
 void	*monitoring_full_routine(void *arg);
 void	init_monitoring(t_monitor_env *env, t_philo *philos);
 void	check_all_done(t_monitor_env env, t_philo *philos);
 void	*monitoring_starve_routine(void *arg);
-void	check_any_to_die(t_monitor_env env, t_philo *philos);
+void	check_any_to_die(t_monitor_env *env, t_philo *philos);
 
 int		philo_atoi(const char *str);
 int		perror_n_return(int exit_status);

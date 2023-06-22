@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 10:08:22 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/22 10:49:31 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/22 18:23:56 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	*monitoring_full_routine(void *arg)
 				env.check++;
 			env.i++;
 		}
-		usleep(5 * T_UNIT);
+		usleep(5 * T_OFFSET);
 	}
 	check_all_done(env, philos);
 	return (NULL);
@@ -59,12 +59,11 @@ void	*monitoring_starve_routine(void *arg)
 			gettimeofday(&(env.time), NULL);
 			if (env.t_last_eat.tv_sec != 0 && get_utime_diff(env.time,
 					env.t_last_eat) > philos->share->t_die)
-				env.check = philos->share->n_philo + 1;
+				check_any_to_die(&env, philos);
 			env.i++;
 		}
 		usleep(5 * T_OFFSET);
 	}
-	check_all_done(env, philos);
 	return (NULL);
 }
 
@@ -73,7 +72,7 @@ void	init_monitoring(t_monitor_env *env, t_philo *philos)
 	pthread_mutex_lock(&philos->share->all_alive_lock);
 	env->t_last_eat = philos->share->t_start;
 	pthread_mutex_unlock(&philos->share->all_alive_lock);
-	usleep(philo_max(2 * T_OFFSET, 10 * philos->share->n_philo));
+	usleep(philo_max(4 * T_OFFSET, 14 * philos->share->n_philo));
 	env->check = 0;
 }
 
@@ -88,13 +87,15 @@ void	check_all_done(t_monitor_env env, t_philo *philos)
 	}
 }
 
-void	check_any_to_die(t_monitor_env env, t_philo *philos)
+void	check_any_to_die(t_monitor_env *env, t_philo *philos)
 {
-	if (env.check == philos->share->n_philo)
+	pthread_mutex_lock(&philos->share->all_alive_lock);
+	if (philos->share->all_alive == ALL_ALIVE)
 	{
-		pthread_mutex_lock(&philos->share->all_alive_lock);
-		if (philos->share->all_alive == ALL_ALIVE)
-			philos->share->all_alive = ANY_TO_DIE;
-		pthread_mutex_unlock(&philos->share->all_alive_lock);
+		philos->share->all_alive = ANY_DEAD;
+		philo_print(get_utime_diff(env->time, philos->share->t_start) / 1000,
+			env->i + 1, DIE);
 	}
+	pthread_mutex_unlock(&philos->share->all_alive_lock);
+	env->check = 1;
 }

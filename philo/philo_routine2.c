@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/22 10:33:29 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/22 15:07:31 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	philo_think(t_philo *philo, t_timeval time)
 {
 	if (philo->status == TO_THINK)
 	{
-		usleep(7 * T_OFFSET);
+		usleep(3 * T_OFFSET);
 		philo->status = THINKING;
 		return (THINK);
 	}

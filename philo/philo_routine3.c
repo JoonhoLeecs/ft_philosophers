@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/22 10:33:40 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/22 18:22:09 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	refresh_unit_time(t_philo *philo, t_timeval time)
 	t_left_die = philo->share->t_die - get_utime_diff(time, philo->t_last_eat);
 	t_left_min = (philo_min(t_left_state, t_left_die) * 3) / 4;
 	if (philo->status == EATING)
-		t_left_min = philo_min(t_left_min, 7000);
+		t_left_min = philo_min(t_left_min, 3000);
 	if (T_UNIT < t_left_min)
 		return ((int) t_left_min);
 	else
@@ -41,23 +41,12 @@ void	philo_printf(t_msg msg, t_philo *philo)
 	t_timeval	print_time;
 
 	pthread_mutex_lock(&philo->share->all_alive_lock);
-	if (philo->share->all_alive == ALL_ALIVE
-		|| (philo->share->all_alive == ANY_TO_DIE && msg == DIE))
+	if (philo->share->all_alive == ALL_ALIVE)
 	{
 		gettimeofday(&print_time, NULL);
 		philo_print(get_utime_diff(print_time, philo->share->t_start) / 1000,
 			philo->ind + 1, msg);
-		if (msg == DIE)
-			philo->share->all_alive = ANY_DEAD;
-		else if (msg == EAT)
-		{
-			pthread_mutex_lock(&philo->pub_t_last_eat_lock);
-			philo->pub_t_last_eat = print_time;
-			pthread_mutex_unlock(&philo->pub_t_last_eat_lock);
-			philo->t_last_eat = print_time;
-		}
-		else if (msg == SLEEP)
-			philo->t_last_sleep = print_time;
+		update_time(msg, print_time, philo);
 	}
 	if (philo->share->all_alive != ALL_ALIVE)
 	{
@@ -67,4 +56,19 @@ void	philo_printf(t_msg msg, t_philo *philo)
 	}
 	pthread_mutex_unlock(&philo->share->all_alive_lock);
 	philo->msg = NONE;
+}
+
+void	update_time(t_msg msg, t_timeval print_time, t_philo *philo)
+{
+	if (msg == DIE)
+		philo->share->all_alive = ANY_DEAD;
+	else if (msg == EAT)
+	{
+		pthread_mutex_lock(&philo->pub_t_last_eat_lock);
+		philo->pub_t_last_eat = print_time;
+		pthread_mutex_unlock(&philo->pub_t_last_eat_lock);
+		philo->t_last_eat = print_time;
+	}
+	else if (msg == SLEEP)
+		philo->t_last_sleep = print_time;
 }
