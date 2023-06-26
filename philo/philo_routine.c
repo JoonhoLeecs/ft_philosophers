@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/26 08:51:34 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/26 09:33:25 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	routine_init(t_philo *philo, \
 	pthread_mutex_unlock(&philo->pub_t_last_eat_lock);
 	philo->t_last_sleep = philo->t_last_eat;
 	if (philo->ind % 2 == 0)
-		usleep(philo_max(3 * T_OFFSET, 7 * philo->share->n_philo));
+		usleep(3 * T_OFFSET + 7 * philo->share->n_philo);
 }
 
 int	check_starvation(t_philo *philo, t_timeval time)

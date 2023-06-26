@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/21 08:52:43 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/26 09:33:36 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	routine_init(t_philo *philo,
 	philo->pub_t_last_eat = philo->t_last_eat;
 	sem_post(philo->last_eat_sem);
 	if (philo->ind % 2 == 0)
-		usleep(philo_max(T_OFFSET, philo->share->n_philo * 5));
+		usleep(3 * T_OFFSET + 7 * philo->share->n_philo);
 	if (pthread_create(&philo->starving_monitor, NULL,
 			starving_monitor, philo) != 0)
 		exit (EXIT_FAILURE);
