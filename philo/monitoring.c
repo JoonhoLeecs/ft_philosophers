@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/10 10:08:22 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/22 18:23:56 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/26 09:09:13 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void	init_monitoring(t_monitor_env *env, t_philo *philos)
 	pthread_mutex_lock(&philos->share->all_alive_lock);
 	env->t_last_eat = philos->share->t_start;
 	pthread_mutex_unlock(&philos->share->all_alive_lock);
-	usleep(philo_max(4 * T_OFFSET, 14 * philos->share->n_philo));
+	usleep(philo_max(6 * T_OFFSET, 14 * philos->share->n_philo));
 	env->check = 0;
 }
 

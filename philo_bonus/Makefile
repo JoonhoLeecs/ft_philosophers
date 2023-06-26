@@ -2,7 +2,6 @@ NAME = philo_bonus
 
 CC = cc
 CFLAGS = -Werror -Wall -Wextra
-LDFLAGS = -pthread
 
 MAKE = make
 MFLAGS = -C
@@ -32,10 +31,10 @@ all : $(NAME)
 bonus : $(NAME)
 
 $(NAME) : $(BONUS_OBJS) $(HEADER)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(BONUS_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(BONUS_OBJS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean :
 	$(RM) $(RMFLAGS) $(BONUS_OBJS)

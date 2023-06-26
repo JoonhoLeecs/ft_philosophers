@@ -6,7 +6,7 @@
 /*   By: joonhlee <joonhlee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 07:40:33 by joonhlee          #+#    #+#             */
-/*   Updated: 2023/06/22 11:09:51 by joonhlee         ###   ########.fr       */
+/*   Updated: 2023/06/26 09:21:01 by joonhlee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@ int	main(int argc, char **argv)
 	if (philos == NULL)
 		return (clear_share_perror_return(share, EXIT_FAILURE));
 	i = rev_iterator(thread_create(share, philos, &check), share->n_philo);
-	if (check == 0)
+	if (check == 0 && i + 2 >= share->n_philo)
 		check += pthread_join(share->monitoring_starve, NULL);
-	if (share->n_eat > -1)
+	if (share->n_eat > -1 && i + 2 >= share->n_philo)
 		check += pthread_join(share->monitoring_full, NULL);
 	while (i > -1)
 	{
